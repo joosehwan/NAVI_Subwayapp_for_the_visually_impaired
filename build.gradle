@@ -1,24 +1,3 @@
-// This file provides basic support for building the TensorFlow demo
-// in Android Studio with Gradle.
-//
-// Note that Bazel is still used by default to compile the native libs,
-// and should be installed at the location noted below. This build file
-// automates the process of calling out to it and copying the compiled
-// libraries back into the appropriate directory.
-//
-// Alternatively, experimental support for Makefile builds is provided by
-// setting nativeBuildSystem below to 'makefile'. This will allow building the demo
-// on Windows machines, but note that full equivalence with the Bazel
-// build is not yet guaranteed. See comments below for caveats and tips
-// for speeding up the build, such as enabling ccache.
-// NOTE: Running a make build will cause subsequent Bazel builds to *fail*
-// unless the contrib/makefile/downloads/ and gen/ dirs are deleted afterwards.
-
-// The cmake build only creates libtensorflow_demo.so. In this situation,
-// libtensorflow_inference.so will be acquired via the tensorflow.aar dependency.
-
-// It is necessary to customize Gradle's build directory, as otherwise
-// it will conflict with the BUILD file used by Bazel on case-insensitive OSs.
 project.buildDir = 'gradleBuild'
 getProject().setBuildDir('gradleBuild')
 

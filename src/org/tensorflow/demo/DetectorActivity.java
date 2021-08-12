@@ -251,7 +251,7 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        transfer_data = subwayapi.gettransfer("127.0681672642", "37.5408957525", "127.0649394519", "37.6147437525");
+                        transfer_data = subwayapi.gettransfer("127.0851803257", "37.5370090906", "127.065197", "37.61493");
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

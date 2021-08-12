@@ -12,7 +12,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,15 +33,17 @@ public class Subwayapi {
     public static String Src_gpsY;
     public static String Src_Station_name;
     public static String Dst_Station_name;
-    String transfer_station;
 
-    public String getTransfer_station() {
-        return transfer_station;
-    }
-
-    public void setTransfer_station(String transfer_station) {
-        this.transfer_station = transfer_station;
-    }
+    //처음 받을 배열리스트
+    ArrayList<String> tr_Fname = new ArrayList<String>();
+    ArrayList<String> tr_Tname = new ArrayList<String>();
+    ArrayList<String> tr_RouteNm = new ArrayList<String>();
+    ArrayList<String> tr_Time = new ArrayList<String>();
+    //저장을 위한 clone 리스트
+    ArrayList<String> tr_Fname_clone = new ArrayList<String>();
+    ArrayList<String> tr_Tname_clone = new ArrayList<String>();
+    ArrayList<String> tr_RouteNm_clone = new ArrayList<String>();
+    ArrayList<String> tr_Time_clone = new ArrayList<String>();
 
 
     public String getDst_gpsX() {
@@ -93,6 +97,9 @@ public class Subwayapi {
         Dst_Station_name = dst_Station_name;
     }
 
+    int count = 0;
+    boolean countl;
+
     // 열차위치역과 열차번호 받는 함수
     public void request_Getsubwaynum() {
         Call<List<TrainNum>> getCall = serviceApi.get_trainnum();
@@ -108,6 +115,7 @@ public class Subwayapi {
                     }
                 }
             }
+
             @Override
             public void onFailure(Call<List<TrainNum>> call, Throwable throwable) {
             }
@@ -126,6 +134,7 @@ public class Subwayapi {
                 System.out.println("전체 바디=" + new Gson().toJson(response.body()));
                 System.out.println("responsebody =" + trainNum);
             }
+
             @Override
             public void onFailure(Call<TrainNum> call, Throwable throwable) {
             }
@@ -136,7 +145,7 @@ public class Subwayapi {
     public String gettransfer(String src_gpsX, String src_gpsY, String dst_gpsX, String dst_gpsY) {
 
         StringBuffer buffer = new StringBuffer();
-        int count = 0;
+
 
         String queryUrl = "http://ws.bus.go.kr/api/rest/pathinfo/getPathInfoBySubway?ServiceKey=" + key
                 + "&startX=" + src_gpsX + "&startY=" + src_gpsY + "&endX=" + dst_gpsX + "&endY=" + dst_gpsY;
@@ -155,60 +164,64 @@ public class Subwayapi {
             int eventType = xpp.getEventType();
 
             while (eventType != XmlPullParser.END_DOCUMENT) {
+
                 switch (eventType) {
+
                     case XmlPullParser.START_DOCUMENT:
                         buffer.append("파싱 시작...\n\n");
                         break;
 
                     case XmlPullParser.START_TAG:
+
                         tag = xpp.getName();//태그 이름 얻어오기
                         if (tag.equals("itemList")) {
-
+//                            buffer.append("--------------------------");
+                            xpp.next();
+//                            buffer.append("\n"); //줄바꿈 문자 추가
                         }// 첫번째 검색결과
-                        else if (tag.equals("fname")) {
-
-                            buffer.append("fname : ");
+                        else if (tag.equals("pathList")) {
+//                            buffer.append("------------");
                             xpp.next();
-                            buffer.append(xpp.getText());//addr 요소의 TEXT 읽어와서 문자열버퍼에 추가
-                            buffer.append("\n"); //줄바꿈 문자 추가
-                        } else if (tag.equals("fx")) {
+//                            buffer.append("\n"); //줄바꿈 문자 추가
 
-                            buffer.append("fx : ");
-                            xpp.next();
-                            buffer.append(xpp.getText());
-                            buffer.append("\n");
-                        } else if (tag.equals("fy")) {
+                        } else if (tag.equals("fname")) {
 
-                            buffer.append("fy :");
+//                            buffer.append("fname : ");
                             xpp.next();
-                            buffer.append(xpp.getText());//cpId
-                            buffer.append("\n");
+//                            buffer.append(xpp.getText());//addr 요소의 TEXT 읽어와서 문자열버퍼에 추가
+                            tr_Fname.add(xpp.getText());
+//                            buffer.append("\n"); //줄바꿈 문자 추가
+
                         } else if (tag.equals("routeNm")) {
-                            buffer.append("routeNm :");
+
+//                            buffer.append("routeNm :");
                             xpp.next();
-                            buffer.append(xpp.getText());//cpNm
+//                            buffer.append(xpp.getText());//cpNm
+                            tr_RouteNm.add(xpp.getText());
+
+                            buffer.append("\n");
+                        } else if (tag.equals("tname")) {
+//                            buffer.append("tname :");
+                            xpp.next();
+//                            buffer.append(xpp.getText());//cpNm
+                            tr_Tname.add(xpp.getText());
                             buffer.append("\n");
 
-                        } else if (tag.equals("tname")) {
-                            buffer.append("tname :");
-                            xpp.next();
-                            buffer.append(xpp.getText());//cpNm
-                            buffer.append("\n");
-                        } else if (tag.equals("tx")) {
-                            buffer.append("tx :");
-                            xpp.next();
-                            buffer.append(xpp.getText());//cpNm
-                            buffer.append("\n");
-                        } else if (tag.equals("ty")) {
-                            buffer.append("ty :");
-                            xpp.next();
-                            buffer.append(xpp.getText());//cpNm
-                            buffer.append("\n");
                         } else if (tag.equals("time")) {
-                            buffer.append("time :");
+//                            buffer.append("time :");
                             xpp.next();
-                            buffer.append(xpp.getText());//cpNm
-                            buffer.append("\n");
+//                            buffer.append(xpp.getText());//cpNm
+                            tr_Time.add(xpp.getText());
+//                            buffer.append("\n");
+                            tr_Time.add("/");
+                            tr_RouteNm.add("/");
+                            tr_Fname.add("/");
+                            tr_Tname.add("/");
+                            tr_Fname_clone = (ArrayList<String>) tr_Fname.clone();
+                            tr_RouteNm_clone = (ArrayList<String>) tr_RouteNm.clone();
+                            tr_Tname_clone = (ArrayList<String>) tr_Tname.clone();
+                            tr_Time_clone = (ArrayList<String>) tr_Time.clone();
+
                         }
                         break;
 
@@ -218,8 +231,11 @@ public class Subwayapi {
                     case XmlPullParser.END_TAG:
                         tag = xpp.getName(); //태그 이름 얻어오기
 
-                        if (tag.equals("itemList")) buffer.append("\n\n\n");// 첫번째 검색결과종료..줄바꿈
+
+                        if (tag.equals("itemList")) buffer.append("\n\n");// 첫번째 검색결과종료..줄바꿈
+
                         break;
+
                 }
 
                 eventType = xpp.next();
@@ -229,10 +245,38 @@ public class Subwayapi {
             // TODO Auto-generated catch blocke.printStackTrace();
             System.out.println(e.getMessage());
         }
+        int find_slash = tr_Fname_clone.indexOf("/");
+        System.out.println("slash " + find_slash);
+        tr_Fname.clear();
+        tr_RouteNm.clear();
+        tr_Time.clear();
+        tr_Tname.clear();
+
+        ArrayList<String> tr_Fname_sliced = new ArrayList<String>(tr_Fname_clone.subList(0, tr_Fname_clone.indexOf("/")));
+        ArrayList<String> tr_RouteNm_sliced = new ArrayList<String>(tr_RouteNm_clone.subList(0, tr_RouteNm_clone.indexOf("/")));
+        ArrayList<String> tr_Tname_sliced = new ArrayList<String>(tr_Tname_clone.subList(0, tr_Tname_clone.indexOf("/")));
+        ArrayList<String> tr_Time_sliced = new ArrayList<String>(tr_Time_clone.subList(0, tr_Time_clone.indexOf("/")));
+
+        System.out.println(tr_RouteNm_sliced);
+        System.out.println(tr_Fname_sliced);
+        System.out.println(tr_Tname_sliced);
+        System.out.println(tr_Time_sliced);
+
+        tr_Fname_clone.clear();
+        tr_RouteNm_clone.clear();
+        tr_Tname_clone.clear();
+        tr_Time_clone.clear();
+
+        for (int i = 0; i < tr_Fname_sliced.size(); i++) {
+            System.out.println(tr_RouteNm_sliced.get(i) + tr_Fname_sliced.get(i) + " 탑승 후 "+tr_Tname_sliced.get(i) + " 하차 ");
+        }
+        System.out.println("예상 소요시간은" + tr_Time_sliced.get(0)+"분 입니다.");
 
         buffer.append("파싱 끝\n");
 
+
         return buffer.toString();//StringBuffer 문자열 객체 반환
+
 
     }
 
