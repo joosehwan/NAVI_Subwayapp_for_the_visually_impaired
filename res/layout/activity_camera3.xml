@@ -27,65 +27,25 @@
     tools:context="org.tensorflow.demo.CameraActivity">
 
 
-    <org.tensorflow.demo.font.OutlineTextView
-        android:id="@+id/station_transport"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:fontFamily="@font/gmarket"
-        android:gravity="center"
-        android:text="환승역 : 태릉입구"
-        android:shadowDx="2.0"
-        android:shadowDy="2.0"
-        android:shadowRadius="1.5"
-        android:textColor="#FAD251"
-        android:textSize="28sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/station_start"
-        app:textStroke="true"
-        app:textStrokeColor="@android:color/black"
-        app:textStrokeWidth="5.0" />
-
+    <!--    긴급호출을 누르면 역사의 사무실로 연결할 수 있도록.-->
 
     <org.tensorflow.demo.font.OutlineTextView
         android:id="@+id/station_destination"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="36dp"
         android:fontFamily="@font/gmarket"
         android:gravity="center"
-        android:text="도착역 : 화랑대"
+        android:hint="도착역 : 화랑대"
         android:shadowDx="2.0"
         android:shadowDy="2.0"
         android:shadowRadius="1.5"
         android:textColor="#FAD251"
         android:textSize="28sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/station_transport"
-        app:textStroke="true"
-        app:textStrokeColor="@android:color/black"
-        app:textStrokeWidth="5.0" />
-
-    <!--    긴급호출을 누르면 역사의 사무실로 연결할 수 있도록.-->
-
-    <org.tensorflow.demo.font.OutlineTextView
-        android:id="@+id/requiredtime"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:fontFamily="@font/gmarket"
-        android:gravity="center"
-        android:text="소요시간 : 32분"
-        android:shadowDx="2.0"
-        android:shadowDy="2.0"
-        android:shadowRadius="1.5"
-        android:textColor="#FAD251"
-        android:textSize="28sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/station_destination"
+        app:layout_constraintTop_toBottomOf="@+id/station_start"
         app:textStroke="true"
         app:textStrokeColor="@android:color/black"
         app:textStrokeWidth="5.0" />
@@ -97,7 +57,7 @@
         android:layout_marginTop="28dp"
         android:fontFamily="@font/gmarket"
         android:gravity="center"
-        android:text="출발역 : 건대입구"
+        android:hint="출발역 : 건대입구"
         android:shadowDx="2.0"
         android:shadowDy="2.0"
         android:shadowRadius="1.5"
@@ -111,21 +71,22 @@
         app:textStrokeWidth="5.0" />
 
     <org.tensorflow.demo.font.OutlineTextView
-        android:id="@+id/main_info"
+        android:id="@+id/maininfo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="36dp"
         android:fontFamily="@font/gmarket"
         android:gravity="center"
-        android:text="2번 출구 근처 화장실이 있습니다. \n\n 태릉입구 하차장에 엘레베이터를 \n\n 이용하실 수 있습니다 "
         android:shadowDx="2.0"
         android:shadowDy="2.0"
         android:shadowRadius="1.5"
+        android:hint="환승정보 : "
         android:textColor="#FAD251"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/requiredtime"
+        app:layout_constraintTop_toBottomOf="@+id/station_destination"
         app:textStroke="true"
         app:textStrokeColor="@android:color/black"
         app:textStrokeWidth="5.0" />
@@ -133,7 +94,7 @@
     <Button
 
         android:id="@+id/emergency_call"
-        android:layout_width="175sp"
+        android:layout_width="170sp"
         android:layout_height="80sp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
@@ -144,13 +105,11 @@
         android:textColor="#000000"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/navi_cancel"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/main_info"
-        app:layout_constraintVertical_bias="0.872"></Button>
+        app:layout_constraintEnd_toEndOf="parent"></Button>
 
     <Button
         android:id="@+id/navi_cancel"
-        android:layout_width="175sp"
+        android:layout_width="170sp"
         android:layout_height="80sp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
@@ -165,7 +124,7 @@
 
     <Button
         android:id="@+id/find_beacon"
-        android:layout_width="175sp"
+        android:layout_width="170sp"
         android:layout_height="80sp"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
@@ -177,15 +136,13 @@
         android:textColor="#000000"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/backto_navi"
-        app:layout_constraintEnd_toStartOf="@+id/emergency_call"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/main_info"
-        app:layout_constraintVertical_bias="0.872"></Button>
+
+        app:layout_constraintVertical_bias="0.968"></Button>
 
     <Button
         android:id="@+id/backto_navi"
-        android:layout_width="175sp"
+        android:layout_width="170sp"
         android:layout_height="80sp"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
@@ -196,8 +153,6 @@
         android:textColor="#000000"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/navi_cancel"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"></Button>
 
 

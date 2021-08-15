@@ -4,6 +4,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import org.jetbrains.annotations.NotNull;
 import org.tensorflow.demo.network.ServiceApi;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -29,10 +30,49 @@ public class Subwayapi {
 
     private String Dst_gpsX;
     private String Dst_gpsY;
+
+    public String getDst_gpsX2() {
+        return Dst_gpsX2;
+    }
+
+
+    public String getDst_gpsY2() {
+        return Dst_gpsY2;
+    }
+
+    private String Dst_gpsX2;
+    private String Dst_gpsY2;
     public static String Src_gpsX;
     public static String Src_gpsY;
+    public static String Src_gpsX2;
+    public static String Src_gpsY2;
+
+    public static String getSrc_gpsX2() {
+        return Src_gpsX2;
+    }
+
+    public static void setSrc_gpsX2(String src_gpsX2) {
+        Src_gpsX2 = src_gpsX2;
+    }
+
+    public static String getSrc_gpsY2() {
+        return Src_gpsY2;
+    }
+
+    public static void setSrc_gpsY2(String src_gpsY2) {
+        Src_gpsY2 = src_gpsY2;
+    }
+
+
+    public static void setSrc_Station_name2(String src_Station_name2) {
+        Src_Station_name2 = src_Station_name2;
+    }
+
+    public static String Src_Station_name2;
     public static String Src_Station_name;
     public static String Dst_Station_name;
+
+    public static String Dst_Station_name2;
 
     //처음 받을 배열리스트
     ArrayList<String> tr_Fname = new ArrayList<String>();
@@ -46,46 +86,19 @@ public class Subwayapi {
     ArrayList<String> tr_Time_clone = new ArrayList<String>();
 
 
-    public String getDst_gpsX() {
-        return Dst_gpsX;
+    public String getTransfer_tts() {
+        return transfer_tts;
     }
 
-    public void setDst_gpsX(String dst_gpsX) {
-        Dst_gpsX = dst_gpsX;
+    public void setTransfer_tts(String transfer_tts) {
+        this.transfer_tts = transfer_tts;
     }
 
-    public String getDst_gpsY() {
-        return Dst_gpsY;
-    }
+    String transfer_tts = "";
 
-    public void setDst_gpsY(String dst_gpsY) {
-        Dst_gpsY = dst_gpsY;
-    }
-
-
-    public static String getSrc_gpsX() {
-        return Src_gpsX;
-    }
-
-    public static String getSrc_gpsY() {
-        return Src_gpsY;
-    }
 
     public static String getSrc_Station_name() {
         return Src_Station_name;
-    }
-
-
-    public static void setSrc_gpsX(String src_gpsX) {
-        Src_gpsX = src_gpsX;
-    }
-
-    public static void setSrc_gpsY(String src_gpsY) {
-        Src_gpsY = src_gpsY;
-    }
-
-    public static void setSrc_Station_name(String src_Station_name) {
-        Src_Station_name = src_Station_name;
     }
 
 
@@ -93,12 +106,6 @@ public class Subwayapi {
         return Dst_Station_name;
     }
 
-    public static void setDst_Station_name(String dst_Station_name) {
-        Dst_Station_name = dst_Station_name;
-    }
-
-    int count = 0;
-    boolean countl;
 
     // 열차위치역과 열차번호 받는 함수
     public void request_Getsubwaynum() {
@@ -218,6 +225,7 @@ public class Subwayapi {
                             tr_Fname.add("/");
                             tr_Tname.add("/");
                             tr_Fname_clone = (ArrayList<String>) tr_Fname.clone();
+                            System.out.println(tr_Fname_clone);
                             tr_RouteNm_clone = (ArrayList<String>) tr_RouteNm.clone();
                             tr_Tname_clone = (ArrayList<String>) tr_Tname.clone();
                             tr_Time_clone = (ArrayList<String>) tr_Time.clone();
@@ -268,9 +276,15 @@ public class Subwayapi {
         tr_Time_clone.clear();
 
         for (int i = 0; i < tr_Fname_sliced.size(); i++) {
-            System.out.println(tr_RouteNm_sliced.get(i) + tr_Fname_sliced.get(i) + " 탑승 후 "+tr_Tname_sliced.get(i) + " 하차 ");
+            System.out.println(tr_RouteNm_sliced.get(i) + " " + tr_Fname_sliced.get(i) + " 탑승 후  \n\n" + tr_Tname_sliced.get(i) + " 하차 \n\n");
+            transfer_tts += (tr_RouteNm_sliced.get(i) + tr_Fname_sliced.get(i) + " 탑승 후 " + tr_Tname_sliced.get(i) + " 하차 \n\n");
         }
-        System.out.println("예상 소요시간은" + tr_Time_sliced.get(0)+"분 입니다.");
+        System.out.println("예상 소요시간은 " + tr_Time_sliced.get(0) + "분 입니다.");
+        transfer_tts += ("예상 소요시간은" + tr_Time_sliced.get(0) + "분 입니다.");
+        if (transfer_tts.isEmpty() == true) {
+            transfer_tts = "경로설정에러";
+        }
+
 
         buffer.append("파싱 끝\n");
 
@@ -281,14 +295,18 @@ public class Subwayapi {
     }
 
     //지하철 정보를 얻어오는 함수
-    public String get_Src_XmlData(String location) {
-        location = URLEncoder.encode(location);
+    public String get_Src_XmlData(@NotNull String location) {
 
+        if (location.contains("역") != true) {
+            location += "역";
+        }
+        System.out.println("location : " + location);
 
+        System.out.println("location : " + location);
         StringBuffer buffer = new StringBuffer();
         String queryUrl = "http://ws.bus.go.kr/api/rest/pathinfo/getLocationInfo"//요청 URL
                 + "?ServiceKey=" + key
-                + "&stSrch=" + location;
+                + "&stSrch=" + URLEncoder.encode(location);
 
         try {
             URL url = new URL(queryUrl);//문자열로 된 요청 url을 URL 객체로 생성.
@@ -317,40 +335,45 @@ public class Subwayapi {
 
                         if (tag.equals("itemList")) ;// 첫번째 검색결과
                         else if (tag.equals("gpsX")) {
-                            buffer.append("Src_gpsX : ");
+//                            buffer.append("Src_gpsX : ");
                             xpp.next();
-                            buffer.append(xpp.getText());
+//                            buffer.append(xpp.getText());
                             Src_gpsX = xpp.getText();
 
                             buffer.append("\n"); //줄바꿈 문자 추가
                         } else if (tag.equals("gpsY")) {
-                            buffer.append("Src_gpsY : ");
+//                            buffer.append("Src_gpsY : ");
                             xpp.next();
-                            buffer.append(xpp.getText());
+//                            buffer.append(xpp.getText());
                             Src_gpsY = xpp.getText();
 
                             buffer.append("\n");
                         } else if (tag.equals("poiId")) {
-                            buffer.append("poiId :");
+//                            buffer.append("poiId :");
                             xpp.next();
-                            buffer.append(xpp.getText());//cpId
+//                            buffer.append(xpp.getText());//cpId
                             buffer.append("\n");
                         } else if (tag.equals("poiNm")) {
-                            buffer.append("poiNm :");
+//                            buffer.append("poiNm :");
                             xpp.next();
-                            buffer.append(xpp.getText());//cpNm
+//                            buffer.append(xpp.getText());//cpNm
                             buffer.append("\n");
-                            if (xpp.getText().contains("번출구")) {
+                            System.out.println("equals " + xpp.getText().equals(location));
+                            if (xpp.getText().equals(location) == true) {
                                 Src_Station_name = xpp.getText();
-                                count = 1;
-                                if (count == 1) {
-                                    buffer.append("확정 :  ");
-                                    setSrc_gpsX(Src_gpsX);
-                                    setSrc_gpsY(Src_gpsY);
-                                    setSrc_Station_name(Src_Station_name);
-                                    xpp.next();
-                                    count += 1;
-                                }
+
+                                buffer.append("확정 :  ");
+
+                                Src_gpsX2 = Src_gpsX;
+                                Src_gpsY2 = Src_gpsY;
+                                Src_Station_name2 = Src_Station_name;
+                                setSrc_Station_name2(Src_Station_name2);
+                                setSrc_gpsX2(Src_gpsX2);
+                                setSrc_gpsY2(Src_gpsY2);
+
+                                xpp.next();
+
+
                                 break;
                             }
                             buffer.append("\n");
@@ -375,6 +398,9 @@ public class Subwayapi {
             // TODO Auto-generated catch blocke.printStackTrace();
             System.out.println(e.getMessage());
         }
+        System.out.println("Src_Station_name2 : " + Src_Station_name2);
+        System.out.println("Src_gpsX2 : " + Src_gpsX2);
+        System.out.println("Src_gpsY2 : " + Src_gpsY2);
 
         buffer.append("파싱 끝\n");
 
@@ -384,15 +410,19 @@ public class Subwayapi {
     }
 
     //지하철 정보를 얻어오는 함수
-    public String get_Dst_XmlData(String location) {
-        location = URLEncoder.encode(location);
+    public String get_Dst_XmlData(@NotNull String location) {
 
+        if (location.contains("역") != true) {
+            location += "역";
+        }
+        System.out.println("location : " + location);
+        //   location = URLEncoder.encode(location);
 
         StringBuffer buffer = new StringBuffer();
 
         String queryUrl = "http://ws.bus.go.kr/api/rest/pathinfo/getLocationInfo"//요청 URL
                 + "?ServiceKey=" + key
-                + "&stSrch=" + location;
+                + "&stSrch=" + URLEncoder.encode(location);
 
         try {
             URL url = new URL(queryUrl);//문자열로 된 요청 url을 URL 객체로 생성.
@@ -421,41 +451,41 @@ public class Subwayapi {
 
                         if (tag.equals("itemList")) ;// 첫번째 검색결과
                         else if (tag.equals("gpsX")) {
-                            buffer.append("Dst_gpsX : ");
+                            //    buffer.append("Dst_gpsX : ");
                             xpp.next();
-                            buffer.append(xpp.getText());
+                            //  buffer.append(xpp.getText());
                             Dst_gpsX = xpp.getText();
 
 
                             buffer.append("\n"); //줄바꿈 문자 추가
                         } else if (tag.equals("gpsY")) {
-                            buffer.append("Dst_gpsY : ");
+                            //   buffer.append("Dst_gpsY : ");
                             xpp.next();
-                            buffer.append(xpp.getText());
+                            // buffer.append(xpp.getText());
                             Dst_gpsY = xpp.getText();
 
                             buffer.append("\n");
                         } else if (tag.equals("poiId")) {
-                            buffer.append("poiId :");
+                           // buffer.append("poiId :");
                             xpp.next();
-                            buffer.append(xpp.getText());//cpId
+                         //   buffer.append(xpp.getText());//cpId
                             buffer.append("\n");
                         } else if (tag.equals("poiNm")) {
-                            buffer.append("poiNm :");
+//                            buffer.append("poiNm :");
                             xpp.next();
-                            buffer.append(xpp.getText());//cpNm
+//                            buffer.append(xpp.getText());//cpNm
                             buffer.append("\n");
-                            if (xpp.getText().contains("번출구")) {
+                            System.out.println("이퀄스 : " + xpp.getText().equals(location));
+                            if (xpp.getText().equals(location) == true) {
                                 Dst_Station_name = xpp.getText();
-                                count = 1;
-                                if (count == 1) {
-                                    buffer.append("확정 :  ");
-                                    setDst_gpsX(Dst_gpsX);
-                                    setDst_gpsY(Dst_gpsY);
-                                    setDst_Station_name(Dst_Station_name);
-                                    xpp.next();
-                                    count += 1;
-                                }
+
+                                buffer.append("확정 :  ");
+                              Dst_gpsX2=Dst_gpsX;
+                              Dst_gpsY2=Dst_gpsY;
+                              Dst_Station_name2=Dst_Station_name;
+                                xpp.next();
+
+
                                 break;
                             }
                             buffer.append("\n");

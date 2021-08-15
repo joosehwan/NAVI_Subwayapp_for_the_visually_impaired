@@ -35,25 +35,37 @@ public class Subpage extends Activity {
         setContentView(R.layout.activity_camera3);
 
         Button back = findViewById(R.id.backto_navi);
-        Button cancel =findViewById(R.id.navi_cancel);
+        Button cancel = findViewById(R.id.navi_cancel);
         TextView tv1 = findViewById(R.id.station_start);
         Button emCall = findViewById(R.id.emergency_call);
         TextView tv2 = findViewById(R.id.station_destination);
+        TextView tv3 = findViewById(R.id.maininfo);
         Intent get_intent = getIntent();
         final String Src_station;
         Src_station = get_intent.getStringExtra("src");
         final String Dst_station;
         Dst_station = get_intent.getStringExtra("dst");
-        System.out.println("src : "+Src_station);
-        System.out.println("dst : "+Dst_station);
-        Log.d("", "dst_station =" + Dst_station);
+        final String transfer_info;
+        transfer_info = get_intent.getStringExtra("transfer");
+        Toast.makeText(this, transfer_info, Toast.LENGTH_SHORT).show();
+
+//        System.out.println("src : "+Src_station);
+//        System.out.println("dst : "+Dst_station);
+//        Log.d("", "dst_station =" + Dst_station);
         try {
             tv1.setText(Src_station);
             tv2.setText(Dst_station);
+            tv3.setText(transfer_info);
             setResult(Activity.RESULT_OK, get_intent);
+            if (Src_station == null) {
+                tv1.setText("출발역 : 정보없음");
+            }if (Dst_station == null) {
+                tv2.setText("도착역 : 정보없음");
+            }if (transfer_info.isEmpty() == true ) {
+                tv3.setText("환승역 : 정보없음");
+            }
         } catch (Exception e) {
-            tv1.setText("출발역 : 정보없음");
-            tv2.setText("도착역 : 정보없음");
+
 
         }
 
@@ -64,6 +76,7 @@ public class Subpage extends Activity {
                 Intent intent = new Intent(getApplicationContext(), DetectorActivity.class);
                 intent.putExtra("Src", Src_station);
                 intent.putExtra("Dst", Dst_station);
+                intent.putExtra("transfer",transfer_info);
                 startActivity(intent);
                 finish();
             }
@@ -130,6 +143,7 @@ public class Subpage extends Activity {
 
 
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         // 사용자 요청, 요청한 권한들, 응답들
@@ -141,12 +155,10 @@ public class Subpage extends Activity {
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                     startActivity(intent);
                 }
-            }
-            else {
+            } else {
                 Toast.makeText(Subpage.this, "권한요청을 거부했습니다.", Toast.LENGTH_SHORT).show();
             }
         }
-
 
 
     }

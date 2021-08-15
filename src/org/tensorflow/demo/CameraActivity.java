@@ -98,9 +98,6 @@ public abstract class CameraActivity extends Activity
         }
     }
 
-    public void onButtonClicked1(View view) {
-        Toast.makeText(getApplicationContext(), "왼쪽 화살표 눌림", Toast.LENGTH_LONG).show();
-    }
 
 
     private byte[] lastPreviewFrame;
@@ -231,6 +228,7 @@ public abstract class CameraActivity extends Activity
         }
         Trace.endSection();
     }
+
 
     @Override
     public synchronized void onStart() {
