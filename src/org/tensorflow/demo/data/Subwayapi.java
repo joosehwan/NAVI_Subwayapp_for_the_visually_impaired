@@ -68,12 +68,12 @@ public class Subwayapi {
         Src_Station_name2 = src_Station_name2;
     }
 
-    public static String Src_Station_name2;
+
     public static String Src_Station_name;
     public static String Dst_Station_name;
-
-    public static String Dst_Station_name2;
-
+    //저장을 위한 배열열
+   public static String Dst_Station_name2;
+    public static String Src_Station_name2;
     //처음 받을 배열리스트
     ArrayList<String> tr_Fname = new ArrayList<String>();
     ArrayList<String> tr_Tname = new ArrayList<String>();
