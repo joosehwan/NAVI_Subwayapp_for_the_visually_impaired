@@ -102,12 +102,14 @@ public class MainActivity extends Activity {
                     }
                 }
                 if (isScanning) {
+                    System.out.println("스캔종료");
                     isScanning = false;
                     mStart_scan.setText("Start");
                     if (mMinewBeaconManager != null) {
                         mMinewBeaconManager.stopScan();
                     }
                 } else {
+                    System.out.println("스캔시작");
                     isScanning = true;
                     mStart_scan.setText("Stop");
                     try {
@@ -128,7 +130,12 @@ public class MainActivity extends Activity {
              */
             @Override
             public void onAppearBeacons(List<MinewBeacon> minewBeacons) {
-
+                for (MinewBeacon minewBeacon : minewBeacons) {
+                    String deviceName = minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue();
+//                            Toast.makeText(getApplicationContext(), deviceName + "  on range", Toast.LENGTH_SHORT).show();
+                    System.out.println("on appear name : " + minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_Name).getStringValue());
+                    System.out.println("on appear name : " + minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue());
+                }
             }
 
             /**

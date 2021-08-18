@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import org.tensorflow.demo.DetectorActivity;
 import org.tensorflow.demo.R;
 import org.tensorflow.demo.TensorFlowYoloDetector;
+import org.tensorflow.demo.blescan.MainActivity;
 import org.tensorflow.demo.data.LoginData;
 import org.tensorflow.demo.data.LoginResponse;
 import org.tensorflow.demo.network.RetrofitClient;
@@ -40,6 +41,7 @@ public class LoginActivity extends Activity {
     private Button mnameLoginButton;
     private Button mJoinButton;
     private Voice voice;
+    private Button btButton;
     private ServiceApi service;
 
 
@@ -52,6 +54,7 @@ public class LoginActivity extends Activity {
         mPasswordView = findViewById(R.id.login_password);
         mnameLoginButton = findViewById(R.id.login_gotoLogin);
         mJoinButton = findViewById(R.id.login_gotoJoin);
+        btButton = findViewById(R.id.bt);
         //voice 객체
         voice = new Voice(this, null);
         service = RetrofitClient.getClient().create(ServiceApi.class);
@@ -72,6 +75,14 @@ public class LoginActivity extends Activity {
                 startActivity(intent);
                 voice.TTS("회원가입으로 이동합니다.");
                 voice.close();
+                finish();
+            }
+        });
+        btButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
                 finish();
             }
         });

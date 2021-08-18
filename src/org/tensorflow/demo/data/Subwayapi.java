@@ -129,6 +129,7 @@ public class Subwayapi {
         });
     }
 
+//    현재시간 보내는 함수
     public void post_Time_Src(String nowtime, String Src_station) {
         TrainNum tr = new TrainNum();
         tr.setNowtime(nowtime);

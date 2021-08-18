@@ -848,7 +848,10 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
                         is_station_perfect = true;
                         System.out.println("is station perfect =" + is_station_perfect);
                         if (is_station_perfect == true) {
+//
+//
 //          1.출발지와 목적지가 정확하다면 현재시각과 출발역을 서버로 post통신한다
+
                             String nowTime = getTime();
                             String Src = Src_station;
                             TrainNum tn = new TrainNum();
@@ -908,24 +911,7 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
                                     });
                                 }
                             }).start();
-//                            System.out.println("레디2=" + isgpsready);
-//                            if (isgpsready == true) {
-////
-//                                System.out.println("레디3=" + isgpsready);
-//                                new Thread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        transfer_data = subwayapi.gettransfer(src_gps_x, src_gps_y, dst_gps_x, dst_gps_y);
-//                                        runOnUiThread(new Runnable() {
-//                                            @Override
-//                                            public void run() {
 //
-//                                            }
-//                                        });
-//                                    }
-//                                }).start();
-//
-//                            }
                         }
 
                     }
