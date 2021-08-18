@@ -1,18 +1,20 @@
 package org.tensorflow.demo.blescan;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.os.Bundle;
 
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;import android.util.Log;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.minew.beacon.BeaconValueIndex;
 import com.minew.beacon.BluetoothState;
 import com.minew.beacon.MinewBeacon;
 import com.minew.beacon.MinewBeaconManager;
@@ -27,7 +29,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private MinewBeaconManager mMinewBeaconManager;
-    private RecyclerView mRecycle;
+
     private BeaconListAdapter mAdapter;
     private static final int REQUEST_ENABLE_BT = 2;
     private boolean isScanning;
@@ -69,18 +71,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void initView() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        mStart_scan = (TextView) findViewById(R.id.start_scan);
 
-        mRecycle = (RecyclerView) findViewById(R.id.recyeler);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        mRecycle.setLayoutManager(layoutManager);
+        mStart_scan = (Button) findViewById(R.id.start_scan);
         mAdapter = new BeaconListAdapter();
-        mRecycle.setAdapter(mAdapter);
-        mRecycle.addItemDecoration(new RecycleViewDivider(this, LinearLayoutManager
-                .HORIZONTAL));
     }
 
     private void initManager() {
@@ -125,17 +119,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mRecycle.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                state = newState;
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-            }
-        });
 
         mMinewBeaconManager.setDeviceManagerDelegateListener(new MinewBeaconManagerListener() {
             /**
@@ -177,8 +160,13 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             mAdapter.setItems(minewBeacons);
                         }
-
+                        for (MinewBeacon minewBeacon : minewBeacons) {
+                            String deviceName = minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue();
+//                            Toast.makeText(getApplicationContext(), deviceName + "  on range", Toast.LENGTH_SHORT).show();
+                            System.out.println("on range UUID : " + minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue());
+                        }
                     }
+
                 });
             }
 

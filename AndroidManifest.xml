@@ -72,6 +72,9 @@
         android:theme="@style/MaterialTheme"
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true"
+        tools:replace="android:appComponentFactory"
+        android:appComponentFactory="whateverString"
+
         tools:ignore="HardcodedDebugMode">
 
 
