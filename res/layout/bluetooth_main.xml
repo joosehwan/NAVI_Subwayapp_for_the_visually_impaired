@@ -24,6 +24,7 @@
         android:layout_height="match_parent"></TextView>
 </ScrollView>
 
+
 </LinearLayout>
     <!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
     <!--    xmlns:tools="http://schemas.android.com/tools"-->

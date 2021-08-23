@@ -1,9 +1,5 @@
 package org.tensorflow.demo.data;
 
-import android.widget.Toast;
-
-import com.google.gson.Gson;
-
 import org.jetbrains.annotations.NotNull;
 import org.tensorflow.demo.network.ServiceApi;
 import org.xmlpull.v1.XmlPullParser;
@@ -14,12 +10,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeSet;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class Subwayapi {
     //restapi 서버 통신 객체 선언
@@ -107,47 +97,10 @@ public class Subwayapi {
     }
 
 
-    // 열차위치역과 열차번호 받는 함수
-    public void request_Getsubwaynum() {
-        Call<List<TrainNum>> getCall = serviceApi.get_trainnum();
-        getCall.enqueue(new Callback<List<TrainNum>>() {
-            @Override
-            public void onResponse(Call<List<TrainNum>> call, Response<List<TrainNum>> response) {
-                if (response.isSuccessful()) {
-                    List<TrainNum> trainNumList = response.body();
-                    String result = "";
-                    for (TrainNum item : trainNumList) {
-                        result += "열차위치역 : " + item.getTrainlocation() + "\n"
-                                + "열차번호 : " + item.getTrainnum() + "\n";
-                    }
-                }
-            }
 
-            @Override
-            public void onFailure(Call<List<TrainNum>> call, Throwable throwable) {
-            }
-        });
-    }
 
-//    현재시간 보내는 함수
-    public void post_Time_Src(String nowtime, String Src_station) {
-        TrainNum tr = new TrainNum();
-        tr.setNowtime(nowtime);
-        tr.setSrcstation(Src_station);
-        Call<TrainNum> postCall = serviceApi.post_trainnum(tr);
-        postCall.enqueue(new Callback<TrainNum>() {
-            @Override
-            public void onResponse(Call<TrainNum> call, Response<TrainNum> response) {
-                TrainNum trainNum = response.body();
-                System.out.println("전체 바디=" + new Gson().toJson(response.body()));
-                System.out.println("responsebody =" + trainNum);
-            }
 
-            @Override
-            public void onFailure(Call<TrainNum> call, Throwable throwable) {
-            }
-        });
-    }
+
 
     //지하철 환승데이터를 받는 함수
     public String gettransfer(String src_gpsX, String src_gpsY, String dst_gpsX, String dst_gpsY) {

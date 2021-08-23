@@ -16,8 +16,6 @@
 
 package org.tensorflow.demo;
 
-import androidx.annotation.RequiresApi;
-
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -55,6 +53,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -71,6 +70,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
 
 import org.tensorflow.demo.OverlayView.DrawCallback;
+import org.tensorflow.demo.data.SubwayData;
+import org.tensorflow.demo.data.SubwayResponse;
 import org.tensorflow.demo.data.Subwayapi;
 import org.tensorflow.demo.data.TrainNum;
 import org.tensorflow.demo.env.BorderedText;
@@ -80,7 +81,6 @@ import org.tensorflow.demo.network.RetrofitClient;
 import org.tensorflow.demo.network.ServiceApi;
 import org.tensorflow.demo.tracking.MultiBoxTracker;
 import org.tensorflow.demo.vision_module.Compass;
-//import org.tensorflow.demo.vision_module.InstanceTimeBuffer;
 import org.tensorflow.demo.vision_module.MyCallback;
 import org.tensorflow.demo.vision_module.MyGps;
 import org.tensorflow.demo.vision_module.SOTWFormatter;
@@ -88,13 +88,7 @@ import org.tensorflow.demo.vision_module.Sector;
 import org.tensorflow.demo.vision_module.Service;
 import org.tensorflow.demo.vision_module.Voice;
 import org.tensorflow.demo.vision_module.senario;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -106,8 +100,7 @@ import java.util.Vector;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+
 
 /**
  * An activity that uses a TensorFlowMultiBoxDetector and ObjectTracker to detect and then track
@@ -200,7 +193,7 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
     //  SubPage를 거쳐온 지하철 데이터들. 유지되어야하는 변수들_static
     public static String Src_static = "";
     public static String Dst_static = "";
-   public static String transfer_static="";
+    public static String transfer_static = "";
     TensorFlowYoloDetector tensorFlowYoloDetector = new TensorFlowYoloDetector();
     TreeSet<String> arr;
     ArrayList<String> Deduplicated_labellist;
@@ -218,7 +211,7 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
     static boolean isgpsready = false;
 
     //restapi 서버 통신 객체 선언
-    private ServiceApi serviceApi;
+    public ServiceApi serviceApi;
 
     //공공데이터 인증키
     final static String key = "zWzMth1ANw2%2F4ne5OjB8q8nqI4E%2Bzd6niSgLNpkcx1Y8IaSzo8fbu6IaR%2FfDtQhHpldYIdgtQwna%2FdXSCvgkHg%3D%3D";
@@ -231,6 +224,8 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        serviceApi = RetrofitClient.getClient().create(ServiceApi.class);
 
 //      subPage값들 받아오기
         Button Path_Settings = findViewById(R.id.input_dest);
@@ -249,20 +244,7 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
         readocr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        transfer_data = subwayapi.get_Src_XmlData("수원");
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                System.out.println(transfer_data);
 
-//
-                            }
-                        });
-                    }
-                }).start();
 
             }
         });
@@ -275,8 +257,8 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
                 intent.putExtra("src", Src_station);
                 intent.putExtra("dst", Dst_station);
                 intent.putExtra("example", "값확인");
-                if(subwayapi.getTransfer_tts()!=null){
-                    intent.putExtra("transfer",subwayapi.getTransfer_tts());
+                if (subwayapi.getTransfer_tts() != null) {
+                    intent.putExtra("transfer", subwayapi.getTransfer_tts());
                 }
 
 
@@ -310,13 +292,17 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
                     for (int i = 0; i < Deduplicated_labellist.size(); i++) {
                         front += Deduplicated_labellist.get(i) + "  ";
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     voice.TTS("전방 내용없음.");
                 }
 
                 ocrtext.setText(front);
                 voice.TTS("전방에" + front + "들이 있습니다.");
 
+
+                startPost(new SubwayData("먹골", " "));
+                request_Getsubwaynum();
+//
 //
             }
         });
@@ -343,7 +329,7 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
 
             destination.setText("도착역 미정");
             start.setText("출발역 미정");
-            }
+        }
 
 
         // 5 * 5 분면의 InstanceBuffer 초기화
@@ -852,12 +838,10 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
 //
 //          1.출발지와 목적지가 정확하다면 현재시각과 출발역을 서버로 post통신한다
 
-                            String nowTime = getTime();
-                            String Src = Src_station;
-                            TrainNum tn = new TrainNum();
-                            tn.setNowtime(nowTime);
-                            tn.setSrcstation(Src);
 
+                            TrainNum tn = new TrainNum();
+
+//                            subwayapi.post_Src(Src_station);
                             new Thread(new Runnable() {
 
                                 @Override
@@ -1172,4 +1156,52 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
         return getTime;
     }
 
+
+    public void startPost(SubwayData data) {
+        serviceApi.subwayPost(data).enqueue(new Callback<SubwayResponse>() {
+            @Override
+            public void onResponse(Call<SubwayResponse> call, Response<SubwayResponse> response) {
+                SubwayResponse result = response.body();
+                if (response.isSuccessful()) {
+                    String result_body = new Gson().toJson(response.body());
+                    System.out.println(result_body + " = result-body ");
+                    System.out.println(result.toString() + " = result-body ");
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SubwayResponse> call, Throwable throwable) {
+                System.out.println(throwable.getMessage());
+
+            }
+        });
+    }
+
+    // 열차위치역과 열차번호 받는 함수
+    public void request_Getsubwaynum() {
+        Call<List<TrainNum>> getCall = serviceApi.get_trainnum();
+        getCall.enqueue(new Callback<List<TrainNum>>() {
+            @Override
+            public void onResponse(Call<List<TrainNum>> call, Response<List<TrainNum>> response) {
+                if (response.isSuccessful()) {
+                    List<TrainNum> trainNumList = response.body();
+                    String result = "";
+                    for (TrainNum item : trainNumList) {
+                        result += "trainline : " + item.getTrainline() + "\n"
+                                + "arrivetime : " + item.getArrivetime() + "\n"
+                                + "traino : " + item.getTraino() + "\n"
+                                + "station : " + item.getStation() + "\n"
+
+                        ;
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<TrainNum>> call, Throwable throwable) {
+                System.out.println(throwable.getMessage());
+            }
+        });
+    }
 }

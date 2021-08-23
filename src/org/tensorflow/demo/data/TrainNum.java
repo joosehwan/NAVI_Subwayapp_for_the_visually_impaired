@@ -3,44 +3,47 @@ package org.tensorflow.demo.data;
 import com.google.gson.annotations.SerializedName;
 
 public class TrainNum {
-    private String nowtime;
-    private String srcstation;
-    private String trainlocation;
-    private String trainnum;
 
-    public String getTrainlocation() {
-        return trainlocation;
+    public String getTrainline() {
+        return trainline;
     }
 
-    public void setTrainlocation(String trainlocation) {
-        this.trainlocation = trainlocation;
+    public void setTrainline(String trainline) {
+        this.trainline = trainline;
     }
 
-    public String getTrainnum() {
-        return trainnum;
+    public int getArrivetime() {
+        return arrivetime;
     }
 
-    public void setTrainnum(String trainnum) {
-        this.trainnum = trainnum;
+    public void setArrivetime(int arrivetime) {
+        this.arrivetime = arrivetime;
     }
 
-
-
-    public String getNowtime() {
-        return nowtime;
+    public int getTraino() {
+        return traino;
     }
 
-    public void setNowtime(String nowtime) {
-        this.nowtime = nowtime;
+    public void setTraino(int traino) {
+        this.traino = traino;
     }
 
-    public String getSrcstation() {
-        return srcstation;
+    public String getStation() {
+        return station;
     }
 
-    public void setSrcstation(String srcstation) {
-        this.srcstation = srcstation;
+    public void setStation(String station) {
+        this.station = station;
     }
+
+    @SerializedName("trainline")
+    private String trainline;
+    @SerializedName("arrivetime")
+    private int arrivetime;
+    @SerializedName("traino")
+    private int traino;
+    @SerializedName("station")
+    private String station;
 
 
 
