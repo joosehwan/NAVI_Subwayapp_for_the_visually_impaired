@@ -210,6 +210,9 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
     static String dst_gps_y;
     static boolean isgpsready = false;
 
+    //post로 보낼 src데이터
+    String src_post_data;
+    String dst_post_data;
     //restapi 서버 통신 객체 선언
     public ServiceApi serviceApi;
 
@@ -231,7 +234,7 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
         Button Path_Settings = findViewById(R.id.input_dest);
         Button readocr = findViewById(R.id.readOCR);
         TextView station_transport = findViewById(R.id.station_transport);
-
+        Button takesubway = findViewById(R.id.takesubway);
         station_transport.bringToFront();
 
         soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
@@ -246,6 +249,22 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
             public void onClick(View v) {
 
 
+            }
+        });
+//        탑승할때 버튼
+        takesubway.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    if (src_post_data.isEmpty() != true && dst_post_data.isEmpty() != true) {
+                        startPost((new SubwayData(src_post_data, dst_post_data)));
+                    }
+                } catch (Exception e) {
+
+                }
+
+//                startPost(new SubwayData("먹골", "먹골2"));
+                request_Getsubwaynum();
             }
         });
 
@@ -297,11 +316,14 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
                 }
 
                 ocrtext.setText(front);
-                voice.TTS("전방에" + front + "들이 있습니다.");
+                if (front.isEmpty() == true) {
+                    voice.TTS("전방에 장애물이 없습니다");
+                    ocrtext.setText("전방에 장애물이 없습니다");
+                } else {
+                    voice.TTS("전방에" + front + "들이 있습니다.");
+                }
 
 
-                startPost(new SubwayData("먹골", " "));
-                request_Getsubwaynum();
 //
 //
             }
@@ -863,6 +885,7 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
 
                                             src_gps_x = subwayapi.getSrc_gpsX2();
                                             src_gps_y = subwayapi.getSrc_gpsY2();
+                                            src_post_data = subwayapi.getSrc_Station_name();
                                             System.out.println("x1=" + src_gps_x);
                                             System.out.println("y1=" + src_gps_y);
 
@@ -871,6 +894,7 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
                                             System.out.println(subwayapi.getDst_Station_name() + "의 gps_Y좌표 :" + subwayapi.getDst_gpsY2());
                                             dst_gps_x = subwayapi.getDst_gpsX2();
                                             dst_gps_y = subwayapi.getDst_gpsY2();
+                                            dst_post_data = subwayapi.getDst_Station_name();
                                             System.out.println("x2=" + dst_gps_x);
                                             System.out.println("y2=" + dst_gps_y);
                                             isgpsready = true;
@@ -1178,6 +1202,17 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
         });
     }
 
+    //  request_Getsubwaynum의 리스트
+    ArrayList<String> request_station = new ArrayList<String>();
+    ArrayList<String> request_trainline = new ArrayList<String>();
+    ArrayList<Integer> request_arrivetime = new ArrayList<Integer>();
+
+    //저장을 위한 clone 리스트
+    ArrayList<String> request_station_clone = new ArrayList<String>();
+    ArrayList<String> request_trainline_clone = new ArrayList<String>();
+    ArrayList<Integer> request_arrivetime_clone = new ArrayList<Integer>();
+
+
     // 열차위치역과 열차번호 받는 함수
     public void request_Getsubwaynum() {
         Call<List<TrainNum>> getCall = serviceApi.get_trainnum();
@@ -1187,14 +1222,44 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
                 if (response.isSuccessful()) {
                     List<TrainNum> trainNumList = response.body();
                     String result = "";
+//                  station역 출발, trainline 행 arrivetime 초 뒤 도착합니다
                     for (TrainNum item : trainNumList) {
-                        result += "trainline : " + item.getTrainline() + "\n"
-                                + "arrivetime : " + item.getArrivetime() + "\n"
-                                + "traino : " + item.getTraino() + "\n"
-                                + "station : " + item.getStation() + "\n"
+                        result += "출발역 : " + item.getStation() + "\n"
+                                + "trainline : " + item.getTrainline() + "\n"
+                                + "arrivetime : " + item.getArrivetime();
+                        request_station.add(item.getStation());
+                        request_trainline.add(item.getTrainline());
+                        request_arrivetime.add(item.getArrivetime());
 
-                        ;
                     }
+
+                    request_station_clone = (ArrayList<String>) request_station.clone();
+                    request_trainline_clone = (ArrayList<String>) request_trainline.clone();
+                    request_arrivetime_clone = (ArrayList<Integer>) request_arrivetime.clone();
+
+                    request_station.clear();
+                    request_trainline.clear();
+                    request_arrivetime.clear();
+
+                    System.out.println("request_station_clone :" + request_station_clone);
+                    System.out.println("request_trainline_clone :" + request_trainline_clone);
+                    System.out.println("request_arrivetime_clone :" + request_arrivetime_clone);
+
+                    int size = request_trainline_clone.size();
+                    String arrival_info = "";
+                    for (int i = 0; i < size; i++) {
+                        arrival_info += request_trainline_clone.get(i) + " 열차 ";
+                        if (request_arrivetime_clone.get(i) / 60 == 0) {
+                            arrival_info += " 곧 도착.";
+                        } else {
+                            arrival_info += request_arrivetime_clone.get(i) / 60 + "분 후 도착.\n";
+                        }
+
+
+                    }
+                    System.out.println(arrival_info);
+                    voice.TTS(arrival_info);
+
                 }
             }
 
