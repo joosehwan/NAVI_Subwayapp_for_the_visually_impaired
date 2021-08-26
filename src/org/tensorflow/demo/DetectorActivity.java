@@ -493,17 +493,17 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
 
                         final Vector<String> lines = new Vector<String>();
 
-                        lines.add("");
-                        lines.add("");
-                        lines.add("Compass: " + sotwFormatter.format(service.getAzimuth()));
-                        lines.add("");
-                        lines.add("GPS");
-                        lines.add(" Latitude: " + service.getLatitude());
-                        lines.add(" Longitude: " + service.getLongitude());
-                        lines.add("");
-                        lines.add("Src Station: " + service.getSource_Station());
-                        lines.add("Dst Station: " + service.getDest_Station());
-                        lines.add("");
+//                        lines.add("");
+//                        lines.add("");
+//                        lines.add("Compass: " + sotwFormatter.format(service.getAzimuth()));
+//                        lines.add("");
+//                        lines.add("GPS");
+//                        lines.add(" Latitude: " + service.getLatitude());
+//                        lines.add(" Longitude: " + service.getLongitude());
+//                        lines.add("");
+//                        lines.add("Src Station: " + service.getSource_Station());
+//                        lines.add("Dst Station: " + service.getDest_Station());
+//                        lines.add("");
 
                         borderedText.drawLines(canvas, 10, canvas.getHeight() - 100, lines);
 
@@ -1058,12 +1058,15 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
     //    볼륨 '하'키를 누르면 서비스가 시작된다
     @Override
     public boolean onKeyDown(final int keyCode, final KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP
-                || keyCode == KeyEvent.KEYCODE_BUTTON_L1 || keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+//            || keyCode == KeyEvent.KEYCODE_BUTTON_L1 || keyCode == KeyEvent.KEYCODE_DPAD_CENTER
             this.debug = !this.debug;
-            requestRender();
-            onSetDebug(debug);
+//            디버그창 띄우는 코드
+//            requestRender();
+//            onSetDebug(debug);
+            request_Getsubwaynum();
             return true;
+
         } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
 
 
@@ -1219,6 +1222,7 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
         getCall.enqueue(new Callback<List<TrainNum>>() {
             @Override
             public void onResponse(Call<List<TrainNum>> call, Response<List<TrainNum>> response) {
+
                 if (response.isSuccessful()) {
                     List<TrainNum> trainNumList = response.body();
                     String result = "";
@@ -1252,7 +1256,7 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
                         if (request_arrivetime_clone.get(i) / 60 == 0) {
                             arrival_info += " 곧 도착.";
                         } else {
-                            arrival_info += request_arrivetime_clone.get(i) / 60 + "분 후 도착.\n";
+                            arrival_info += request_arrivetime_clone.get(i) / 60 + "분후 도착 \n";
                         }
 
 
@@ -1266,6 +1270,7 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
             @Override
             public void onFailure(Call<List<TrainNum>> call, Throwable throwable) {
                 System.out.println(throwable.getMessage());
+                voice.TTS("열차도착정보를 받을 수 없습니다. 출발역을 입력하세요");
             }
         });
     }

@@ -78,7 +78,7 @@ public class Voice {
 
 
         tts.setPitch(1.0f);//목소리 톤1.0
-        tts.setSpeechRate(1.5f);//목소리 속도
+        tts.setSpeechRate(2.3f);//목소리 속도
         tts.speak(OutMsg,TextToSpeech.QUEUE_FLUSH,null,null);
         //어플이 종료할때는 완전히 제거
 

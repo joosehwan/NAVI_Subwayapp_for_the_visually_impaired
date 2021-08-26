@@ -31,9 +31,9 @@
 
     <org.tensorflow.demo.font.OutlineTextView
         android:id="@+id/station_destination"
-        android:layout_width="0dp"
+        android:layout_width="0sp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="36sp"
         android:fontFamily="@font/gmarket"
         android:gravity="center"
         android:hint="도착역 : 화랑대"
@@ -52,9 +52,9 @@
 
     <org.tensorflow.demo.font.OutlineTextView
         android:id="@+id/station_start"
-        android:layout_width="0dp"
+        android:layout_width="0sp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="28sp"
         android:fontFamily="@font/gmarket"
         android:gravity="center"
         android:hint="출발역 : 건대입구"
@@ -72,9 +72,9 @@
 
     <org.tensorflow.demo.font.OutlineTextView
         android:id="@+id/maininfo"
-        android:layout_width="0dp"
+        android:layout_width="0sp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="36sp"
         android:fontFamily="@font/gmarket"
         android:gravity="center"
         android:hint="환승정보 : "
@@ -94,40 +94,40 @@
     <Button
 
         android:id="@+id/emergency_call"
-        android:layout_width="380sp"
+        android:layout_width="170sp"
         android:layout_height="80sp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16sp"
+        android:layout_marginBottom="16sp"
         android:background="@drawable/button_style2"
         android:fontFamily="@font/gmarket"
         android:gravity="center"
         android:text="긴급호출"
         android:textColor="#000000"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/navi_cancel"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"></Button>
 
     <Button
         android:id="@+id/navi_cancel"
         android:layout_width="170sp"
         android:layout_height="80sp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16sp"
+        android:layout_marginBottom="20sp"
         android:background="@drawable/button_style2"
         android:fontFamily="@font/gmarket"
         android:gravity="center"
         android:text="현재정보\n읽어주기"
         android:textColor="#000000"
         android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/backto_navi"
         app:layout_constraintEnd_toEndOf="parent"></Button>
 
     <Button
         android:id="@+id/find_beacon"
         android:layout_width="170sp"
         android:layout_height="80sp"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16sp"
+        android:layout_marginBottom="16sp"
         android:background="@drawable/button_style2"
         android:fontFamily="@font/gmarket"
         android:gravity="center"
@@ -144,8 +144,8 @@
         android:id="@+id/backto_navi"
         android:layout_width="170sp"
         android:layout_height="80sp"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16sp"
+        android:layout_marginBottom="16sp"
         android:background="@drawable/button_style2"
         android:fontFamily="@font/gmarket"
         android:gravity="center"
@@ -153,7 +153,7 @@
         android:textColor="#000000"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"></Button>
+        app:layout_constraintEnd_toEndOf="parent"></Button>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
