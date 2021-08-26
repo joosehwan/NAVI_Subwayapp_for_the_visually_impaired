@@ -202,45 +202,47 @@ public class Subwayapi {
 
                 eventType = xpp.next();
             }
+            int find_slash = tr_Fname_clone.indexOf("/");
+            System.out.println("slash " + find_slash);
+            tr_Fname.clear();
+            tr_RouteNm.clear();
+            tr_Time.clear();
+            tr_Tname.clear();
 
-        } catch (Exception e) {
+            ArrayList<String> tr_Fname_sliced = new ArrayList<String>(tr_Fname_clone.subList(0, tr_Fname_clone.indexOf("/")));
+            ArrayList<String> tr_RouteNm_sliced = new ArrayList<String>(tr_RouteNm_clone.subList(0, tr_RouteNm_clone.indexOf("/")));
+            ArrayList<String> tr_Tname_sliced = new ArrayList<String>(tr_Tname_clone.subList(0, tr_Tname_clone.indexOf("/")));
+            ArrayList<String> tr_Time_sliced = new ArrayList<String>(tr_Time_clone.subList(0, tr_Time_clone.indexOf("/")));
+
+            System.out.println(tr_RouteNm_sliced);
+            System.out.println(tr_Fname_sliced);
+            System.out.println(tr_Tname_sliced);
+            System.out.println(tr_Time_sliced);
+
+            tr_Fname_clone.clear();
+            tr_RouteNm_clone.clear();
+            tr_Tname_clone.clear();
+            tr_Time_clone.clear();
+
+            for (int i = 0; i < tr_Fname_sliced.size(); i++) {
+                System.out.println(tr_RouteNm_sliced.get(i) + " " + tr_Fname_sliced.get(i) + " 탑승 후  \n\n" + tr_Tname_sliced.get(i) + " 하차 \n\n");
+                transfer_tts += (tr_RouteNm_sliced.get(i)+" "+ tr_Fname_sliced.get(i) + " 탑승 후\n\n" + tr_Tname_sliced.get(i) + " 하차 \n\n");
+            }
+            System.out.println("예상 소요시간은 " + tr_Time_sliced.get(0) + "분 입니다.");
+            transfer_tts += ("예상 소요시간은" + tr_Time_sliced.get(0) + "분 입니다.");
+            if (transfer_tts.isEmpty() == true) {
+                transfer_tts = "경로설정에러";
+            }
+
+
+            buffer.append("파싱 끝\n");
+        }
+
+        catch (Exception e) {
             // TODO Auto-generated catch blocke.printStackTrace();
             System.out.println(e.getMessage());
         }
-        int find_slash = tr_Fname_clone.indexOf("/");
-        System.out.println("slash " + find_slash);
-        tr_Fname.clear();
-        tr_RouteNm.clear();
-        tr_Time.clear();
-        tr_Tname.clear();
 
-        ArrayList<String> tr_Fname_sliced = new ArrayList<String>(tr_Fname_clone.subList(0, tr_Fname_clone.indexOf("/")));
-        ArrayList<String> tr_RouteNm_sliced = new ArrayList<String>(tr_RouteNm_clone.subList(0, tr_RouteNm_clone.indexOf("/")));
-        ArrayList<String> tr_Tname_sliced = new ArrayList<String>(tr_Tname_clone.subList(0, tr_Tname_clone.indexOf("/")));
-        ArrayList<String> tr_Time_sliced = new ArrayList<String>(tr_Time_clone.subList(0, tr_Time_clone.indexOf("/")));
-
-        System.out.println(tr_RouteNm_sliced);
-        System.out.println(tr_Fname_sliced);
-        System.out.println(tr_Tname_sliced);
-        System.out.println(tr_Time_sliced);
-
-        tr_Fname_clone.clear();
-        tr_RouteNm_clone.clear();
-        tr_Tname_clone.clear();
-        tr_Time_clone.clear();
-
-        for (int i = 0; i < tr_Fname_sliced.size(); i++) {
-            System.out.println(tr_RouteNm_sliced.get(i) + " " + tr_Fname_sliced.get(i) + " 탑승 후  \n\n" + tr_Tname_sliced.get(i) + " 하차 \n\n");
-            transfer_tts += (tr_RouteNm_sliced.get(i) + tr_Fname_sliced.get(i) + " 탑승 후 " + tr_Tname_sliced.get(i) + " 하차 \n\n");
-        }
-        System.out.println("예상 소요시간은 " + tr_Time_sliced.get(0) + "분 입니다.");
-        transfer_tts += ("예상 소요시간은" + tr_Time_sliced.get(0) + "분 입니다.");
-        if (transfer_tts.isEmpty() == true) {
-            transfer_tts = "경로설정에러";
-        }
-
-
-        buffer.append("파싱 끝\n");
 
 
         return buffer.toString();//StringBuffer 문자열 객체 반환

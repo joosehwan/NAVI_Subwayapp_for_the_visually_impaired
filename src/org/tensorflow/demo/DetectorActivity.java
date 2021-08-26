@@ -202,13 +202,26 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
     // 출발역 도착역 api전송하기 위한 변수
     String src_station_data;
     String dst_station_data;
-    String transfer_data;
+
+    String transfer_data = "";
+
+    public void setTransfer_data_tosub(String transfer_data_tosub) {
+        Transfer_data_tosub = transfer_data_tosub;
+    }
+
+    static String Transfer_data_tosub = "";
     // api를 통해 받아온 출발역 도착역의 gps좌표변수
     static String src_gps_x;
     static String src_gps_y;
     static String dst_gps_x;
     static String dst_gps_y;
-    static boolean isgpsready = false;
+
+    public static void setArrivalinfo(String arrivalinfo) {
+        DetectorActivity.arrivalinfo = arrivalinfo;
+    }
+
+    //request_Getsubwaynum의 결과를 저장해주는 변수
+    static String arrivalinfo = "";
 
     //post로 보낼 src데이터
     String src_post_data;
@@ -235,6 +248,7 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
         Button readocr = findViewById(R.id.readOCR);
         TextView station_transport = findViewById(R.id.station_transport);
         Button takesubway = findViewById(R.id.takesubway);
+
         station_transport.bringToFront();
 
         soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
@@ -275,10 +289,10 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
                 System.out.println("time : " + getTime());
                 intent.putExtra("src", Src_station);
                 intent.putExtra("dst", Dst_station);
-                intent.putExtra("example", "값확인");
-                if (subwayapi.getTransfer_tts() != null) {
-                    intent.putExtra("transfer", subwayapi.getTransfer_tts());
-                }
+
+                intent.putExtra("arrivalinfo", arrivalinfo);
+
+                intent.putExtra("transfer", Transfer_data_tosub);
 
 
                 startActivity(intent);
@@ -324,8 +338,6 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
                 }
 
 
-//
-//
             }
         });
 
@@ -557,7 +569,7 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
 
                         if (!DetectorActivity.this.yoloFirstStartFlag) {
                             DetectorActivity.this.yoloFirstStartFlag = true;
-                            voice.TTS("로딩 완료! Vision, 시작 가능합니다.");
+                            voice.TTS("로딩완료");
                         }
 //                        LOGGER.i("Running detection on image " + currTimestamp);
                         final long startTime = SystemClock.uptimeMillis();
@@ -863,7 +875,7 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
 
                             TrainNum tn = new TrainNum();
 
-//                            subwayapi.post_Src(Src_station);
+//
                             new Thread(new Runnable() {
 
                                 @Override
@@ -874,7 +886,9 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
                                     src_station_data = subwayapi.get_Src_XmlData(service.getSource_Station());
                                     dst_station_data = subwayapi.get_Dst_XmlData(service.getDest_Station());
 
-
+//                                  서버에 출발역과 도착역을 보내는 함수 ==> 후에 request_Getsubwaynum 호출을 위함.
+//                                    startPost(new SubwayData(src_station_data, dst_station_data));
+                                    startPost(new SubwayData(service.getSource_Station(), service.getDest_Station()));
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -897,21 +911,27 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
                                             dst_post_data = subwayapi.getDst_Station_name();
                                             System.out.println("x2=" + dst_gps_x);
                                             System.out.println("y2=" + dst_gps_y);
-                                            isgpsready = true;
+
                                             new Thread(new Runnable() {
                                                 @Override
                                                 public void run() {
                                                     transfer_data = subwayapi.gettransfer(src_gps_x, src_gps_y, dst_gps_x, dst_gps_y);
-                                                    runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            System.out.println("환승데이터 : " + transfer_data);
+                                                    if (transfer_data.isEmpty() != true) {
+                                                        runOnUiThread(new Runnable() {
+                                                            @Override
+                                                            public void run() {
+                                                                System.out.println("환승데이터 : " + transfer_data);
 
-                                                            voice.TTS(subwayapi.getTransfer_tts());
-                                                            System.out.println(subwayapi.getTransfer_tts());
+                                                                voice.TTS(subwayapi.getTransfer_tts());
+                                                                System.out.println(subwayapi.getTransfer_tts());
+                                                                setTransfer_data_tosub(subwayapi.getTransfer_tts());
 
-                                                        }
-                                                    });
+                                                            }
+                                                        }); 
+                                                    } else {
+                                                        voice.TTS("경로설정 에러. 다시 설정해주세요");
+                                                    }
+
                                                 }
                                             }).start();
 
@@ -1200,6 +1220,8 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
             @Override
             public void onFailure(Call<SubwayResponse> call, Throwable throwable) {
                 System.out.println(throwable.getMessage());
+                System.out.println("출발역 보내기 실패");
+
 
             }
         });
@@ -1252,16 +1274,18 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
                     int size = request_trainline_clone.size();
                     String arrival_info = "";
                     for (int i = 0; i < size; i++) {
-                        arrival_info += request_trainline_clone.get(i) + " 열차 ";
+                        arrival_info += request_trainline_clone.get(i) + " 열차\n";
                         if (request_arrivetime_clone.get(i) / 60 == 0) {
                             arrival_info += " 곧 도착.";
                         } else {
-                            arrival_info += request_arrivetime_clone.get(i) / 60 + "분후 도착 \n";
+                            arrival_info += request_arrivetime_clone.get(i) / 60 + "분후 도착! \n\n";
                         }
 
 
                     }
                     System.out.println(arrival_info);
+                    setArrivalinfo(arrival_info);
+
                     voice.TTS(arrival_info);
 
                 }

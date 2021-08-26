@@ -9,37 +9,32 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import org.tensorflow.demo.network.RetrofitClient;
-import org.tensorflow.demo.R;
-import org.tensorflow.demo.data.JoinData;
-import org.tensorflow.demo.data.JoinResponse;
-import org.tensorflow.demo.network.ServiceApi;
-import org.tensorflow.demo.vision_module.Voice;
-
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
+import org.tensorflow.demo.vision_module.Voice;
+
 public class Subpage extends Activity {
+    private Voice voice;
+
     protected void onCreate(Bundle savedInstanceState) {
+        voice = new Voice(this, null);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera3);
 
         Button back = findViewById(R.id.backto_navi);
-        Button cancel = findViewById(R.id.navi_cancel);
+        Button readinfo = findViewById(R.id.readinfo);
         TextView tv1 = findViewById(R.id.station_start);
         Button emCall = findViewById(R.id.emergency_call);
         TextView tv2 = findViewById(R.id.station_destination);
+
         TextView tv3 = findViewById(R.id.maininfo);
+        TextView tv4 = findViewById(R.id.arrivalinfo);
         Intent get_intent = getIntent();
         final String Src_station;
         Src_station = get_intent.getStringExtra("src");
@@ -47,25 +42,53 @@ public class Subpage extends Activity {
         Dst_station = get_intent.getStringExtra("dst");
         final String transfer_info;
         transfer_info = get_intent.getStringExtra("transfer");
+        final String arrival;
+        arrival = get_intent.getStringExtra("arrivalinfo");
         Toast.makeText(this, transfer_info, Toast.LENGTH_SHORT).show();
+
+        readinfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    voice.TTS(transfer_info+arrival);
+//                    voice.TTS(arrival);
+//                    if (transfer_info.isEmpty() == true) {
+//                        voice.TTS("환승정보 없음");
+//                    } else if (arrival.isEmpty() == true) {
+//                        voice.TTS("열차정보 없음");
+//                    } else {
+////                        voice.TTS("현재 정보 읽기 오류");
+//                    }
+
+
+                } catch (NullPointerException e) {
+                    e.getMessage();
+                    e.getCause();
+                }
+
+            }
+        });
 
 //        System.out.println("src : "+Src_station);
 //        System.out.println("dst : "+Dst_station);
 //        Log.d("", "dst_station =" + Dst_station);
         try {
-            tv1.setText(Src_station);
-            tv2.setText(Dst_station);
+//            tv1.setText(Src_station);
+//            tv2.setText(Dst_station);
             tv3.setText(transfer_info);
+            tv4.setText(arrival);
             setResult(Activity.RESULT_OK, get_intent);
             if (Src_station == null) {
                 tv1.setText("출발역 : 정보없음");
-            }if (Dst_station == null) {
+            } else if (Dst_station == null) {
                 tv2.setText("도착역 : 정보없음");
-            }if (transfer_info.isEmpty() == true ) {
+            } else if (transfer_info.isEmpty() == true) {
                 tv3.setText("환승역 : 정보없음");
+            } else if (arrival.isEmpty() == true) {
+                tv4.setText("열차도착 : 정보없음");
             }
         } catch (Exception e) {
-
+            System.out.println(e.getMessage());
 
         }
 
@@ -76,7 +99,7 @@ public class Subpage extends Activity {
                 Intent intent = new Intent(getApplicationContext(), DetectorActivity.class);
                 intent.putExtra("Src", Src_station);
                 intent.putExtra("Dst", Dst_station);
-                intent.putExtra("transfer",transfer_info);
+                intent.putExtra("transfer", transfer_info);
                 startActivity(intent);
                 finish();
             }
