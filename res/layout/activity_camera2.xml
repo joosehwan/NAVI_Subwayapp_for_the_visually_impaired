@@ -22,46 +22,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:background="#FEEBB6"
+    android:background="#ffffff"
 
     tools:context="org.tensorflow.demo.CameraActivity">
 
-
-    <org.tensorflow.demo.font.OutlineTextView
-        android:id="@+id/station_transport"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:fontFamily="@font/gmarket"
-        android:gravity="center"
-        android:hint="환승역"
-        android:shadowDx="2.0"
-        android:shadowDy="2.0"
-        android:shadowRadius="1.5"
-        android:textColor="#FAD251"
-        android:textSize="28sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:textStroke="true"
-        app:textStrokeColor="@android:color/black"
-        app:textStrokeWidth="5.0" />
 
     <org.tensorflow.demo.font.OutlineTextView
         android:id="@+id/station_destination"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:fontFamily="@font/gmarket"
+        android:layout_marginEnd="36dp"
+        android:fontFamily="@font/nbgothic"
         android:gravity="center"
         android:shadowDx="2.0"
         android:shadowDy="2.0"
         android:shadowRadius="1.5"
         android:text="도착역"
-        android:textColor="#FAD251"
+        android:textColor="#FFCD4A"
         android:textSize="28sp"
+
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/station_transport"
         app:layout_constraintTop_toTopOf="parent"
         app:textStroke="true"
         app:textStrokeColor="@android:color/black"
@@ -71,18 +52,17 @@
         android:id="@+id/station_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="36dp"
         android:layout_marginTop="16dp"
-        android:fontFamily="@font/gmarket"
+        android:fontFamily="@font/nbgothic"
         android:gravity="center"
         android:shadowDx="2.0"
+
         android:shadowDy="2.0"
-
-
         android:shadowRadius="1.5"
         android:text="출발역"
-        android:textColor="#FAD251"
+        android:textColor="#FFCD4A"
         android:textSize="28sp"
-        app:layout_constraintEnd_toStartOf="@+id/station_transport"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:textStroke="true"
@@ -94,7 +74,7 @@
         android:layout_width="0sp"
         android:layout_height="75sp"
         android:layout_marginBottom="230dp"
-        android:fontFamily="@font/gmarket"
+        android:fontFamily="@font/nbgothic"
         android:gravity="center"
         android:hint="ocr텍스트 내용"
         android:shadowDx="2.0"
@@ -115,7 +95,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="1dp"
         android:layout_marginBottom="1dp"
-        android:fontFamily="@font/gmarket"
+        android:fontFamily="@font/nbgothic"
         android:gravity="center"
         android:hint="전방 인식한 객체들 text로"
         android:shadowDx="2.0"
@@ -138,7 +118,7 @@
         android:layout_marginEnd="16sp"
         android:layout_marginBottom="16sp"
         android:background="@drawable/button_style2"
-        android:fontFamily="@font/gmarket"
+        android:fontFamily="@font/nbgothic"
         android:gravity="center"
         android:text=" 전방 인식 "
         android:textColor="#000000"
@@ -151,7 +131,7 @@
         android:layout_width="175sp"
         android:layout_height="60sp"
         android:background="@drawable/button_style2"
-        android:fontFamily="@font/gmarket"
+        android:fontFamily="@font/nbgothic"
         android:gravity="center"
         android:text="글자읽기"
         android:textColor="#000000"
@@ -170,7 +150,7 @@
         android:layout_marginEnd="16sp"
         android:layout_marginBottom="16sp"
         android:background="@drawable/button_style2"
-        android:fontFamily="@font/gmarket"
+        android:fontFamily="@font/nbgothic"
         android:gravity="center"
         android:text="서브페이지"
         android:textColor="#000000"
@@ -185,7 +165,7 @@
         android:layout_marginStart="16sp"
         android:layout_marginBottom="16sp"
         android:background="@drawable/button_style2"
-        android:fontFamily="@font/gmarket"
+        android:fontFamily="@font/nbgothic"
         android:gravity="center"
         android:text="열차도착 정보"
         android:textColor="#000000"
@@ -200,7 +180,7 @@
         android:layout_marginStart="16sp"
         android:layout_marginBottom="16sp"
         android:background="@drawable/button_style2"
-        android:fontFamily="@font/gmarket"
+        android:fontFamily="@font/nbgothic"
         android:gravity="center"
         android:text="경로설정"
         android:textColor="#000000"
@@ -213,7 +193,7 @@
     <!--        android:id="@+id/cameraclick"-->
     <!--        android:layout_width="0sp"-->
     <!--        android:layout_height="0sp"-->
-    <!--        android:fontFamily="@font/gmarket"-->
+    <!--        android:fontFamily="@font/nbgothic"-->
     <!--        android:gravity="center"-->
     <!--        android:shadowDx="2.0"-->
     <!--        android:shadowDy="2.0"-->

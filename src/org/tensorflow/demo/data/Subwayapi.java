@@ -225,8 +225,8 @@ public class Subwayapi {
             tr_Time_clone.clear();
 
             for (int i = 0; i < tr_Fname_sliced.size(); i++) {
-                System.out.println(tr_RouteNm_sliced.get(i) + " " + tr_Fname_sliced.get(i) + " 탑승 후  \n\n" + tr_Tname_sliced.get(i) + " 하차 \n\n");
-                transfer_tts += (tr_RouteNm_sliced.get(i)+" "+ tr_Fname_sliced.get(i) + " 탑승 후\n\n" + tr_Tname_sliced.get(i) + " 하차 \n\n");
+                System.out.println(tr_RouteNm_sliced.get(i) + " " + tr_Fname_sliced.get(i) + " 탑승 후 " + tr_Tname_sliced.get(i) + " 하차 \n\n");
+                transfer_tts += (tr_RouteNm_sliced.get(i)+" "+ tr_Fname_sliced.get(i) + " 탑승 후 " + tr_Tname_sliced.get(i) + " 하차 \n\n");
             }
             System.out.println("예상 소요시간은 " + tr_Time_sliced.get(0) + "분 입니다.");
             transfer_tts += ("예상 소요시간은" + tr_Time_sliced.get(0) + "분 입니다.");

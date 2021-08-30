@@ -51,6 +51,9 @@ public class Subpage extends Activity {
             public void onClick(View v) {
                 try {
                     voice.TTS(transfer_info+arrival);
+                    if(transfer_info.isEmpty()==true && arrival.isEmpty()==true){
+                        voice.TTS("현재정보가 없습니다. 경로설정이나 열차를 조회하십시오");
+                    }
 //                    voice.TTS(arrival);
 //                    if (transfer_info.isEmpty() == true) {
 //                        voice.TTS("환승정보 없음");
@@ -85,7 +88,7 @@ public class Subpage extends Activity {
             } else if (transfer_info.isEmpty() == true) {
                 tv3.setText("환승역 : 정보없음");
             } else if (arrival.isEmpty() == true) {
-                tv4.setText("열차도착 : 정보없음");
+                tv4.setText("열차도착 : 정보없음\n");
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());

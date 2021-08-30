@@ -107,7 +107,7 @@ import retrofit2.Response;
  * objects.
  */
 @RequiresApi(api = Build.VERSION_CODES.N)
-public class DetectorActivity<Resultlabel> extends CameraActivity implements OnImageAvailableListener {
+public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraActivity implements OnImageAvailableListener {
 
 
     private static final Logger LOGGER = new Logger();
@@ -237,6 +237,7 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
     boolean is_station_perfect = false;
 
 
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -246,10 +247,10 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
 //      subPage값들 받아오기
         Button Path_Settings = findViewById(R.id.input_dest);
         Button readocr = findViewById(R.id.readOCR);
-        TextView station_transport = findViewById(R.id.station_transport);
+
         Button takesubway = findViewById(R.id.takesubway);
 
-        station_transport.bringToFront();
+
 
         soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
         soundID = soundPool.load(this, R.raw.voice_effect, 1);
@@ -1274,11 +1275,11 @@ public class DetectorActivity<Resultlabel> extends CameraActivity implements OnI
                     int size = request_trainline_clone.size();
                     String arrival_info = "";
                     for (int i = 0; i < size; i++) {
-                        arrival_info += request_trainline_clone.get(i) + " 열차\n";
+                        arrival_info += request_trainline_clone.get(i) + "\n\n";
                         if (request_arrivetime_clone.get(i) / 60 == 0) {
                             arrival_info += " 곧 도착.";
                         } else {
-                            arrival_info += request_arrivetime_clone.get(i) / 60 + "분후 도착! \n\n";
+                            arrival_info += request_arrivetime_clone.get(i) / 60 + "분 후 도착 \n";
                         }
 
 
