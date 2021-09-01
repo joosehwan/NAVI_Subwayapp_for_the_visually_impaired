@@ -88,7 +88,7 @@ public class Subpage extends Activity {
             } else if (transfer_info.isEmpty() == true) {
                 tv3.setText("환승역 : 정보없음");
             } else if (arrival.isEmpty() == true) {
-                tv4.setText("열차도착 : 정보없음\n");
+                tv4.setText("열차도착 : 정보없음\n정보없음\n정보없음\n정보없음\n정보없음\n정보없음\n정보없음\n정보없음\n정보없음\n");
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
