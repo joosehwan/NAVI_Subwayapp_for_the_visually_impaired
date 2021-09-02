@@ -73,7 +73,7 @@
         android:id="@+id/cameraOCR"
         android:layout_width="0sp"
         android:layout_height="75sp"
-        android:layout_marginBottom="230dp"
+        android:layout_marginBottom="160dp"
         android:fontFamily="@font/nbgothic"
         android:gravity="center"
         android:hint="ocr텍스트 내용"
@@ -84,12 +84,14 @@
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:textStroke="true"
         app:textStrokeColor="@android:color/black"
         app:textStrokeWidth="5.0" />
 
     <org.tensorflow.demo.font.OutlineTextView
+        android:visibility="gone"
         android:id="@+id/cameracatch"
         android:layout_width="0sp"
         android:layout_height="0dp"
