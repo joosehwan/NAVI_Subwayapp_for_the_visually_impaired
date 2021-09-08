@@ -57,6 +57,8 @@ import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 
+import org.tensorflow.demo.env.Logger;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -64,9 +66,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-
-import org.tensorflow.demo.env.Logger;
-import org.tensorflow.demo.R; // Explicit import needed for internal Google builds.
 
 @SuppressLint("ValidFragment")
 public class CameraConnectionFragment extends Fragment {
@@ -141,6 +140,7 @@ public class CameraConnectionFragment extends Fragment {
    * A {@link CameraCaptureSession } for camera preview.
    */
   private CameraCaptureSession captureSession;
+  
 
   /**
    * A reference to the opened {@link CameraDevice}.
@@ -189,6 +189,7 @@ public class CameraConnectionFragment extends Fragment {
               }
             }
           };
+
 
   /**
    * An additional thread for running tasks that shouldn't block the UI.
@@ -566,15 +567,20 @@ public class CameraConnectionFragment extends Fragment {
                 previewRequest = previewRequestBuilder.build();
                 captureSession.setRepeatingRequest(
                     previewRequest, captureCallback, backgroundHandler);
+
+
+
               } catch (final CameraAccessException e) {
                 LOGGER.e(e, "Exception!");
               }
+
             }
 
             @Override
             public void onConfigureFailed(final CameraCaptureSession cameraCaptureSession) {
               showToast("Failed");
             }
+
           },
           null);
     } catch (final CameraAccessException e) {

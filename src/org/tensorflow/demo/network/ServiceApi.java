@@ -7,6 +7,8 @@ import org.tensorflow.demo.data.LoginResponse;
 import org.tensorflow.demo.data.SubwayData;
 import org.tensorflow.demo.data.SubwayResponse;
 import org.tensorflow.demo.data.TrainNum;
+import org.tensorflow.demo.data.TransportData;
+import org.tensorflow.demo.data.UserpositonData;
 
 import java.util.List;
 
@@ -28,4 +30,9 @@ public interface ServiceApi {
     @GET ("/arrival/")
     Call<List<TrainNum>> get_trainnum();
 
+    @GET ("/naviroot/")
+    Call<List<TransportData>> get_transport();
+
+    @GET ("/userstatus/")
+    Call<List<UserpositonData>> get_userposition();
 }

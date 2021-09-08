@@ -161,6 +161,42 @@
                 android:shadowRadius="1.5"
                 android:textColor="#000000"
                 android:textSize="24sp" />
+
+            <org.tensorflow.demo.font.OutlineTextView
+                android:background="@drawable/font_box_none"
+                android:id="@+id/info3"
+                android:paddingTop="12dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/nbgothic"
+                android:gravity="center"
+                android:shadowDx="2.0"
+                android:shadowDy="2.0"
+                android:shadowRadius="1.5"
+                android:text="실 시 간 열 차 정 보"
+                android:textColor="#FFCD4A"
+                android:textSize="26sp"
+                app:textStroke="true"
+                app:textStrokeColor="@android:color/black"
+                app:textStrokeWidth="3.0"
+                />
+
+            <org.tensorflow.demo.font.OutlineTextView
+                android:background="@drawable/font_box"
+                android:id="@+id/userpositionInfo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:fontFamily="@font/nbgothic"
+                android:gravity="center"
+                android:hint="실시간 열차 정보 내용 "
+                android:padding="16sp"
+                android:shadowDx="2.0"
+                android:shadowDy="2.0"
+                android:shadowRadius="1.5"
+                android:textColor="#000000"
+                android:textSize="24sp" />
         </LinearLayout>
     </ScrollView>
 
@@ -203,18 +239,18 @@
         app:layout_constraintEnd_toEndOf="parent"></Button>
 
     <Button
-        android:id="@+id/find_beacon"
-        android:layout_width="170sp"
+        android:id="@+id/get_userposition"
+        android:layout_width="160sp"
         android:layout_height="80sp"
         android:layout_marginStart="16sp"
         android:layout_marginBottom="16sp"
         android:background="@drawable/button_style2"
         android:fontFamily="@font/nbgothic"
         android:gravity="center"
-        android:text="주변 \n주요장소 확인"
+        android:text="실시간 \n열차위치 확인"
         android:textColor="#000000"
         android:textSize="24sp"
-        android:visibility="gone"
+
         app:layout_constraintBottom_toTopOf="@+id/backto_navi"
         app:layout_constraintStart_toStartOf="parent"
 

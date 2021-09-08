@@ -20,6 +20,7 @@ import android.app.Fragment;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
+import android.hardware.camera2.CameraDevice;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -30,18 +31,19 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import java.io.IOException;
-import java.util.List;
+
 import org.tensorflow.demo.env.ImageUtils;
 import org.tensorflow.demo.env.Logger;
-import org.tensorflow.demo.R; // Explicit import needed for internal Google builds.
+
+import java.io.IOException;
+import java.util.List;
 
 public class LegacyCameraConnectionFragment extends Fragment {
   private Camera camera;
   private static final Logger LOGGER = new Logger();
   private Camera.PreviewCallback imageListener;
   private Size desiredSize;
-
+  private CameraDevice mCameraDevice;
   /**
    * The layout identifier to inflate for this Fragment.
    */
@@ -110,11 +112,15 @@ public class LegacyCameraConnectionFragment extends Fragment {
           textureView.setAspectRatio(s.height, s.width);
 
           camera.startPreview();
+
         }
+
 
         @Override
         public void onSurfaceTextureSizeChanged(
-            final SurfaceTexture texture, final int width, final int height) {}
+            final SurfaceTexture texture, final int width, final int height) {
+
+        }
 
         @Override
         public boolean onSurfaceTextureDestroyed(final SurfaceTexture texture) {
@@ -124,6 +130,9 @@ public class LegacyCameraConnectionFragment extends Fragment {
         @Override
         public void onSurfaceTextureUpdated(final SurfaceTexture texture) {}
       };
+
+//여기까진 똑같아.
+
 
   /**
    * An {@link AutoFitTextureView} for camera preview.
@@ -213,4 +222,5 @@ public class LegacyCameraConnectionFragment extends Fragment {
     }
     return -1; // No camera found
   }
+
 }

@@ -68,12 +68,17 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
+import com.minew.beacon.MinewBeaconManager;
 
 import org.tensorflow.demo.OverlayView.DrawCallback;
+import org.tensorflow.demo.blescan.BeaconListAdapter;
+import org.tensorflow.demo.blescan.UserRssi;
 import org.tensorflow.demo.data.SubwayData;
 import org.tensorflow.demo.data.SubwayResponse;
 import org.tensorflow.demo.data.Subwayapi;
 import org.tensorflow.demo.data.TrainNum;
+import org.tensorflow.demo.data.TransportData;
+import org.tensorflow.demo.data.UserpositonData;
 import org.tensorflow.demo.env.BorderedText;
 import org.tensorflow.demo.env.ImageUtils;
 import org.tensorflow.demo.env.Logger;
@@ -118,36 +123,24 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     // DarkFlow (https://github.com/thtrieu/darkflow). Sample command:
     // ./flow --model cfg/tiny-yolo-voc.cfg --load bin/tiny-yolo-voc.weights --savepb --verbalise
 
+    //Setting----------------------------------------------------------------------------------------------
     private static final String YOLO_MODEL_FILE = "file:///android_asset/hanium_subway_items.pb";
     private static final int YOLO_INPUT_SIZE = 416;
     private static final String YOLO_INPUT_NAME = "input";
     private static final String YOLO_OUTPUT_NAMES = "output";
     private static final int YOLO_BLOCK_SIZE = 32;
-    private String Src_gpsX;
-    private String Src_gpsY;
-    private String Dst_gpsX;
-    private String Dst_gpsY;
-
     private enum DetectorMode {
         YOLO;
     }
-
     private static final DetectorMode MODE = DetectorMode.YOLO;
-
     // Minimum detection confidence to track a detection.
     public static final float MINIMUM_CONFIDENCE_YOLO = 0.5f;
-
     private static final boolean MAINTAIN_ASPECT = MODE == DetectorMode.YOLO;
-
     private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 480);
-
     private static final boolean SAVE_PREVIEW_BITMAP = false;
     private static final float TEXT_SIZE_DIP = 10;
-
     private Integer sensorOrientation;
-
     private Classifier detector;
-
     private long lastProcessingTimeMs;
     private long lastProcessingTimeMs1;
     private long lastDetectStartTime = 0;
@@ -158,24 +151,15 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     private float bitmapWidth = 0;
     private float bitmapHeight = 0;
     private int N = 5; // N * N 사분면
-
     private static final int BUFFERTIME = 3;
-
     private boolean computingDetection = false;
-
     private long timestamp = 0;
-
     private Matrix frameToCropTransform;
     private Matrix cropToFrameTransform;
-
     public MultiBoxTracker tracker;
-
     private OverlayView trackingOverlay;
-
     private byte[] luminanceCopy;
-
     private BorderedText borderedText;
-
     private RequestQueue requestQueue;
     private LocationRequest locationRequest;
     private MyGps myGps;
@@ -186,42 +170,61 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     private Sector curSector = new Sector(false);
     private boolean dotFlag = false;
     private boolean yoloFirstStartFlag = false;
-
     public InstanceMatrix instanceMatrix = new InstanceMatrix();
+    TensorFlowYoloDetector tensorFlowYoloDetector = new TensorFlowYoloDetector();
+
+    //각종 변수--------------------------------------------------------------------------------------
+
+
+    //메인페이지 상단에 뜨는 출발역 도착역 변수
     public static String Src_station;
     public static String Dst_station;
-    //  SubPage를 거쳐온 지하철 데이터들. 유지되어야하는 변수들_static
+
+    //  SubPage를 거쳐온  데이터들. 유지되어야하는 변수들_static
     public static String Src_static = "";
     public static String Dst_static = "";
     public static String transfer_static = "";
-    TensorFlowYoloDetector tensorFlowYoloDetector = new TensorFlowYoloDetector();
+    public static String userposition_static = "";
+
+    // ocr로 검출된 데이터의 중복제거를 위한 변수
     TreeSet<String> arr;
     ArrayList<String> Deduplicated_labellist;
+
+    //음성인식에 띠링 소리를 삽입하기위한 설정변수
     SoundPool soundPool;
     int soundID;
+
     // 출발역 도착역 api전송하기 위한 변수
     String src_station_data;
     String dst_station_data;
 
-    String transfer_data = "";
 
-    public void setTransfer_data_tosub(String transfer_data_tosub) {
-        Transfer_data_tosub = transfer_data_tosub;
-    }
-
-    static String Transfer_data_tosub = "";
-    // api를 통해 받아온 출발역 도착역의 gps좌표변수
+    // 환승역 api에 사용되는 변수----------------------------------------------------------------------
     static String src_gps_x;
     static String src_gps_y;
     static String dst_gps_x;
     static String dst_gps_y;
+    private String Src_gpsX;
+    private String Src_gpsY;
+    private String Dst_gpsX;
+    private String Dst_gpsY;
+    String transfer_data = "";
+    static String Transfer_data_tosub = "";
+    public void setTransfer_data_tosub(String transfer_data_tosub) {
+        Transfer_data_tosub = transfer_data_tosub;
+    }
 
+    //request_Getsubwaynum의 결과를 저장해주는 변수-----------------------------------------------------
+    static String arrivalinfo = "";
     public static void setArrivalinfo(String arrivalinfo) {
         DetectorActivity.arrivalinfo = arrivalinfo;
     }
 
-    //request_Getsubwaynum의 결과를 저장해주는 변수
-    static String arrivalinfo = "";
+    //request_userposition의 결과를 저장해주는 변수-----------------------------------------------------
+    static String userPosition_info = "";
+    public static void setUserPosition_info(String userPosition_info) {
+        DetectorActivity.userPosition_info = userPosition_info;
+    }
 
     //post로 보낼 src데이터
     String src_post_data;
@@ -232,11 +235,17 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     //공공데이터 인증키
     final static String key = "zWzMth1ANw2%2F4ne5OjB8q8nqI4E%2Bzd6niSgLNpkcx1Y8IaSzo8fbu6IaR%2FfDtQhHpldYIdgtQwna%2FdXSCvgkHg%3D%3D";
 
-    //    지하철api 객체선언
+    //지하철api 객체선언
     Subwayapi subwayapi = new Subwayapi();
     boolean is_station_perfect = false;
 
+    //비콘 객체
+    private MinewBeaconManager mMinewBeaconManager;
+    private BeaconListAdapter mAdapter;
+    private static final int REQUEST_ENABLE_BT = 2;
+    private boolean isScanning;
 
+    UserRssi comp = new UserRssi();
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -249,7 +258,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         Button readocr = findViewById(R.id.readOCR);
 
         Button takesubway = findViewById(R.id.takesubway);
-
 
 
         soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
@@ -266,7 +274,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
             }
         });
-//        탑승할때 버튼
+//       열차도착예정버튼()
         takesubway.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -281,6 +289,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 //                startPost(new SubwayData("먹골", "먹골2"));
                 request_Getsubwaynum();
             }
+
         });
 
         goSub.setOnClickListener(new View.OnClickListener() {
@@ -422,6 +431,16 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         });
 
 
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_ENABLE_BT:
+                break;
+        }
     }
 
     @Override
@@ -784,26 +803,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
 //--Function----------------------------------------------------------------------------------------------------------------------------------------
 
-    /* 한글을 영어로 변환 */
-    //초성 - 가(의 ㄱ), 날(ㄴ) 닭(ㄷ)
-    public static String[] arrChoSungEng = {"k", "K", "n", "d", "D", "r", "m", "b", "B", "s", "S",
-            "a", "j", "J", "ch", "c", "t", "p", "h"};
-
-    //중성 - 가(의 ㅏ), 야(ㅑ), 뺨(ㅑ)
-    public static String[] arrJungSungEng = {
-            "a", "e", "ya", "ae", "eo", "e", "yeo", "e", "o", "wa", "wae", "oe",
-            "yo", "u", "wo", "we", "wi", "yu", "eu", "ui", "i"
-    };
-
-    //종성 - 가(없음), 갈(ㄹ)
-    public static String[] arrJongSungEng = {"", "k", "K", "ks", "n", "nj", "nh",
-            "d", "l", "lg", "lm", "lb", "ls", "lt", "lp", "lh", "m", "b", "bs", "s", "ss",
-            "ng", "j", "ch", "c", "t", "p", "h"};
-
-    //단일 자음 - ㄱ,ㄴ,ㄷ,ㄹ... (ㄸ,ㅃ,ㅉ은 단일자음(초성)으로 쓰이지만 단일자음으론 안쓰임)
-    public static String[] arrSingleJaumEng = {"r", "R", "rt", "s", "sw", "sg", "e", "E", "f",
-            "fr", "fa", "fq", "ft", "fx", "fv", "fg", "a", "q", "Q", "qt", "t", "T", "d", "w", "W",
-            "c", "z", "x", "v", "g"};
 
     //어디 지하철 역인지 파악하는 메소드
     public String recognizeStation(String stt_Station) {
@@ -894,44 +893,37 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                                         @Override
                                         public void run() {
 
-                                            System.out.println("검색된 출발역이름 : " + subwayapi.getSrc_Station_name());
-                                            System.out.println(subwayapi.getSrc_Station_name() + "의 gps_X좌표 :" + subwayapi.getSrc_gpsX2());
-                                            System.out.println(subwayapi.getSrc_Station_name() + "의 gps_Y좌표 :" + subwayapi.getSrc_gpsY2());
+//                                            System.out.println("검색된 출발역이름 : " + subwayapi.getSrc_Station_name());
+//                                            System.out.println(subwayapi.getSrc_Station_name() + "의 gps_X좌표 :" + subwayapi.getSrc_gpsX2());
+//                                            System.out.println(subwayapi.getSrc_Station_name() + "의 gps_Y좌표 :" + subwayapi.getSrc_gpsY2());
 
-                                            src_gps_x = subwayapi.getSrc_gpsX2();
-                                            src_gps_y = subwayapi.getSrc_gpsY2();
-                                            src_post_data = subwayapi.getSrc_Station_name();
-                                            System.out.println("x1=" + src_gps_x);
-                                            System.out.println("y1=" + src_gps_y);
+//                                            src_gps_x = subwayapi.getSrc_gpsX2();
+//                                            src_gps_y = subwayapi.getSrc_gpsY2();
+//                                            src_post_data = subwayapi.getSrc_Station_name();
+//                                            System.out.println("x1=" + src_gps_x);
+//                                            System.out.println("y1=" + src_gps_y);
 
-                                            System.out.println("검색된 도착역이름 : " + subwayapi.getDst_Station_name());
-                                            System.out.println(subwayapi.getDst_Station_name() + "의 gps_X좌표 :" + subwayapi.getDst_gpsX2());
-                                            System.out.println(subwayapi.getDst_Station_name() + "의 gps_Y좌표 :" + subwayapi.getDst_gpsY2());
-                                            dst_gps_x = subwayapi.getDst_gpsX2();
-                                            dst_gps_y = subwayapi.getDst_gpsY2();
-                                            dst_post_data = subwayapi.getDst_Station_name();
-                                            System.out.println("x2=" + dst_gps_x);
-                                            System.out.println("y2=" + dst_gps_y);
-
+//                                            System.out.println("검색된 도착역이름 : " + subwayapi.getDst_Station_name());
+//                                            System.out.println(subwayapi.getDst_Station_name() + "의 gps_X좌표 :" + subwayapi.getDst_gpsX2());
+//                                            System.out.println(subwayapi.getDst_Station_name() + "의 gps_Y좌표 :" + subwayapi.getDst_gpsY2());
+//                                            dst_gps_x = subwayapi.getDst_gpsX2();
+//                                            dst_gps_y = subwayapi.getDst_gpsY2();
+//                                            dst_post_data = subwayapi.getDst_Station_name();
+//                                            System.out.println("x2=" + dst_gps_x);
+//                                            System.out.println("y2=" + dst_gps_y);
                                             new Thread(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    transfer_data = subwayapi.gettransfer(src_gps_x, src_gps_y, dst_gps_x, dst_gps_y);
-                                                    if (transfer_data.isEmpty() != true) {
-                                                        runOnUiThread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                System.out.println("환승데이터 : " + transfer_data);
+//                                                    transfer_data = subwayapi.gettransfer(src_gps_x, src_gps_y, dst_gps_x, dst_gps_y);
 
-                                                                voice.TTS(subwayapi.getTransfer_tts());
-                                                                System.out.println(subwayapi.getTransfer_tts());
-                                                                setTransfer_data_tosub(subwayapi.getTransfer_tts());
-
-                                                            }
-                                                        }); 
-                                                    } else {
-                                                        voice.TTS("경로설정 에러. 다시 설정해주세요");
+                                                    try {
+                                                        //환승정보 요청
+                                                        request_getTransportData();
+                                                    } catch (Exception e) {
+                                                        e.getMessage();
+                                                        voice.TTS("환승정보를 불러올 수 없습니다.");
                                                     }
+
 
                                                 }
                                             }).start();
@@ -1085,7 +1077,9 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 //            디버그창 띄우는 코드
 //            requestRender();
 //            onSetDebug(debug);
-            request_Getsubwaynum();
+          // request_getUserposition();
+           // request_Getsubwaynum();
+            request_getTransportData();
             return true;
 
         } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
@@ -1204,7 +1198,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         return getTime;
     }
 
-
     public void startPost(SubwayData data) {
         serviceApi.subwayPost(data).enqueue(new Callback<SubwayResponse>() {
             @Override
@@ -1239,7 +1232,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     ArrayList<Integer> request_arrivetime_clone = new ArrayList<Integer>();
 
 
-    // 열차위치역과 열차번호 받는 함수
+    // 열차위치역과 열차번호 받는 함수 arrival 테이블 긁어오는것
     public void request_Getsubwaynum() {
         Call<List<TrainNum>> getCall = serviceApi.get_trainnum();
         getCall.enqueue(new Callback<List<TrainNum>>() {
@@ -1298,5 +1291,125 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                 voice.TTS("열차도착정보를 받을 수 없습니다. 출발역을 입력하세요");
             }
         });
+    }
+
+    //    환승역 서버로 받기 위한 리스트 선언 .
+
+    ArrayList<String> startwname = new ArrayList<>(); //출발역
+    ArrayList<String> startline = new ArrayList<>(); // 출발역 방향
+    ArrayList<String> exchaline = new ArrayList<>(); // 환승역 방향
+    ArrayList<String> exchawname = new ArrayList<>(); //환승역
+
+    //    저장을 위한 clone 리스트 선언
+    ArrayList<String> startwname_clone = new ArrayList<>(); //출발역
+    ArrayList<String> startline_clone = new ArrayList<>(); // 출발역 방향
+    ArrayList<String> exchaline_clone = new ArrayList<>(); // 환승역 방향
+    ArrayList<String> exchawname_clone = new ArrayList<>(); //환승역
+
+    // 환승역정보를 get하는 함수
+    public void request_getTransportData() {
+        Call<List<TransportData>> getCall = serviceApi.get_transport();
+        getCall.enqueue(new Callback<List<TransportData>>() {
+            @Override
+            public void onResponse(Call<List<TransportData>> call, Response<List<TransportData>> response) {
+                if (response.isSuccessful()) {
+                    List<TransportData> transportData = response.body();
+                    String result = "";
+                    for (TransportData item : transportData) {
+                        result += "출발역 : " + item.getStartname() + "\n"
+                                + "출발역 방향 : " + item.getStartline() + "\n"
+                                + "환승역 : " + item.getExchawname() + "\n"
+                                + "환승역 방향 : " + item.getExchaline();
+                        startwname.add(item.getStartname());
+                        startline.add(item.getStartline());
+                        exchawname.add(item.getExchawname());
+                        exchaline.add(item.getExchaline());
+
+                    }
+                    startwname_clone = (ArrayList<String>) startwname.clone();
+                    startline_clone = (ArrayList<String>) startline.clone();
+                    exchawname_clone = (ArrayList<String>) exchawname.clone();
+                    exchaline_clone = (ArrayList<String>) exchaline.clone();
+
+                    startwname.clear();
+                    startline.clear();
+                    exchawname.clear();
+                    exchaline.clear();
+
+                    int size = startwname_clone.size();
+                    String transport_info = "";
+                    for (int i = 0; i < size; i++) {
+                        transport_info += startwname_clone.get(i) + "역 "
+                                + startline_clone.get(i) + "행 열차 승차 후 \n\n"
+                                + exchawname_clone.get(i) + "역 "
+                                + exchaline_clone.get(i) + " 행 열차 환승. \n\n";
+                    }
+                    transport_info += "목적지 " + Dst_station + "하차.";
+                    System.out.println(transport_info);
+                    //subpage로 보내기 위한 set
+                    setTransfer_data_tosub(transport_info);
+                    voice.TTS(transport_info);
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<TransportData>> call, Throwable throwable) {
+                voice.TTS("환승정보를 받을 수 없습니다. ");
+            }
+        });
+
+    }
+
+    // userposition 을 받기위한 리스트 선언
+    ArrayList<Integer> usertrain = new ArrayList<>();
+    ArrayList<String> usersta = new ArrayList<>();
+    ArrayList<Integer> usertrain_clone = new ArrayList<>();
+    ArrayList<String> usersta_clone = new ArrayList<>();
+
+    public void request_getUserposition() {
+        Call<List<UserpositonData>> getCall = serviceApi.get_userposition();
+        getCall.enqueue(new Callback<List<UserpositonData>>() {
+            @Override
+            public void onResponse(Call<List<UserpositonData>> call, Response<List<UserpositonData>> response) {
+                if (response.isSuccessful()) {
+                    List<UserpositonData> userpositonData = response.body();
+                    String result = "";
+                    for (UserpositonData item : userpositonData) {
+                        result += "실시간 열차 번호 : " + item.getusertrain()
+                                + "\n실시간 열차위치(역) :" + item.getusersta();
+
+                        usertrain.add(item.getusertrain());
+                        usersta.add(item.getusersta());
+                    }
+                    System.out.println(result);
+                    usertrain_clone = (ArrayList<Integer>) usertrain.clone();
+                    usersta_clone = (ArrayList<String>) usersta.clone();
+                    usertrain.clear();
+                    usersta.clear();
+
+                    int size = usertrain_clone.size();
+                    String userposition_info = "";
+                    for (int i = 0; i < size; i++) {
+                        userposition_info += "실시간 열차 번호 : " + usertrain_clone.get(i) + "\n"
+                                + "실시간 열차위치(역) :" + usersta_clone.get(i);
+
+                    }
+                    System.out.println(userposition_info);
+                    setUserPosition_info(userposition_info);
+                    voice.TTS(userposition_info);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<UserpositonData>> call, Throwable throwable) {
+                voice.TTS("실시간 열차정보를 받을 수 없습니다. ");
+            }
+        });
+
+    }
+
+    public void takepicture() {
+
     }
 }

@@ -24,6 +24,7 @@ import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
@@ -35,17 +36,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Trace;
-import android.util.Log;
 import android.util.Size;
-import android.view.KeyEvent;
 import android.view.Surface;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 
 import org.tensorflow.demo.env.ImageUtils;
 import org.tensorflow.demo.env.Logger;
@@ -73,7 +69,7 @@ public abstract class CameraActivity extends Activity
 
     protected int previewWidth = 0;
     protected int previewHeight = 0;
-
+    private CameraDevice mCameraDevice;
     private Runnable postInferenceCallback;
     private Runnable imageConverter;
     // private service 객체 선언
@@ -118,6 +114,7 @@ public abstract class CameraActivity extends Activity
     /**
      * Callback for android.hardware.Camera API
      */
+
     @Override
     public void onPreviewFrame(final byte[] bytes, final Camera camera) {
         if (isProcessingFrame) {
@@ -166,6 +163,7 @@ public abstract class CameraActivity extends Activity
     /**
      * Callback for Camera2 API
      */
+
     @Override
     public void onImageAvailable(final ImageReader reader) {
         //We need wait until we have some size from onPreviewSizeChosen
