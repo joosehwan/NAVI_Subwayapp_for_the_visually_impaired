@@ -78,7 +78,6 @@ import org.tensorflow.demo.data.SubwayResponse;
 import org.tensorflow.demo.data.Subwayapi;
 import org.tensorflow.demo.data.TrainNum;
 import org.tensorflow.demo.data.TransportData;
-import org.tensorflow.demo.data.UserpositonData;
 import org.tensorflow.demo.env.BorderedText;
 import org.tensorflow.demo.env.ImageUtils;
 import org.tensorflow.demo.env.Logger;
@@ -220,11 +219,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         DetectorActivity.arrivalinfo = arrivalinfo;
     }
 
-    //request_userposition의 결과를 저장해주는 변수-----------------------------------------------------
-    static String userPosition_info = "";
-    public static void setUserPosition_info(String userPosition_info) {
-        DetectorActivity.userPosition_info = userPosition_info;
-    }
+
 
     //post로 보낼 src데이터
     String src_post_data;
@@ -256,15 +251,14 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 //      subPage값들 받아오기
         Button Path_Settings = findViewById(R.id.input_dest);
         Button readocr = findViewById(R.id.readOCR);
-
         Button takesubway = findViewById(R.id.takesubway);
 
 
         soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
         soundID = soundPool.load(this, R.raw.voice_effect, 1);
 
-        final TextView ocrtext = findViewById(R.id.cameracatch);
-        TextView detectedClass = findViewById(R.id.cameraclick);
+        final TextView ocrtext = findViewById(R.id.cameraOCR);
+        final TextView detectedClass = findViewById(R.id.cameraclick);
         Button goSub = findViewById(R.id.goto_subpage);
 
         readocr.setOnClickListener(new View.OnClickListener() {
@@ -285,8 +279,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                 } catch (Exception e) {
 
                 }
-
-//                startPost(new SubwayData("먹골", "먹골2"));
                 request_Getsubwaynum();
             }
 
@@ -297,8 +289,8 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), Subpage.class);
                 System.out.println("time : " + getTime());
-                intent.putExtra("src", Src_station);
-                intent.putExtra("dst", Dst_station);
+
+
 
                 intent.putExtra("arrivalinfo", arrivalinfo);
 
@@ -838,7 +830,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
             }
 
-
             @Override
             public void callbackBundle(Bundle results) {
 
@@ -871,12 +862,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 //
 //
 //          1.출발지와 목적지가 정확하다면 현재시각과 출발역을 서버로 post통신한다
-
-
-                            TrainNum tn = new TrainNum();
-
-//
-                            new Thread(new Runnable() {
+             new Thread(new Runnable() {
 
                                 @Override
                                 public void run() {
@@ -1268,18 +1254,17 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                     int size = request_trainline_clone.size();
                     String arrival_info = "";
                     for (int i = 0; i < size; i++) {
-                        arrival_info += request_trainline_clone.get(i) + "\n\n";
+                        arrival_info += request_trainline_clone.get(i) + "\n";
                         if (request_arrivetime_clone.get(i) / 60 == 0) {
                             arrival_info += " 곧 도착.";
                         } else {
-                            arrival_info += request_arrivetime_clone.get(i) / 60 + "분 후 도착 \n";
+                            arrival_info += request_arrivetime_clone.get(i) / 60 + "분 후 도착 \n\n";
                         }
 
 
                     }
                     System.out.println(arrival_info);
                     setArrivalinfo(arrival_info);
-
                     voice.TTS(arrival_info);
 
                 }
@@ -1361,53 +1346,52 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
     }
 
-    // userposition 을 받기위한 리스트 선언
-    ArrayList<Integer> usertrain = new ArrayList<>();
-    ArrayList<String> usersta = new ArrayList<>();
-    ArrayList<Integer> usertrain_clone = new ArrayList<>();
-    ArrayList<String> usersta_clone = new ArrayList<>();
-
-    public void request_getUserposition() {
-        Call<List<UserpositonData>> getCall = serviceApi.get_userposition();
-        getCall.enqueue(new Callback<List<UserpositonData>>() {
-            @Override
-            public void onResponse(Call<List<UserpositonData>> call, Response<List<UserpositonData>> response) {
-                if (response.isSuccessful()) {
-                    List<UserpositonData> userpositonData = response.body();
-                    String result = "";
-                    for (UserpositonData item : userpositonData) {
-                        result += "실시간 열차 번호 : " + item.getusertrain()
-                                + "\n실시간 열차위치(역) :" + item.getusersta();
-
-                        usertrain.add(item.getusertrain());
-                        usersta.add(item.getusersta());
-                    }
-                    System.out.println(result);
-                    usertrain_clone = (ArrayList<Integer>) usertrain.clone();
-                    usersta_clone = (ArrayList<String>) usersta.clone();
-                    usertrain.clear();
-                    usersta.clear();
-
-                    int size = usertrain_clone.size();
-                    String userposition_info = "";
-                    for (int i = 0; i < size; i++) {
-                        userposition_info += "실시간 열차 번호 : " + usertrain_clone.get(i) + "\n"
-                                + "실시간 열차위치(역) :" + usersta_clone.get(i);
-
-                    }
-                    System.out.println(userposition_info);
-                    setUserPosition_info(userposition_info);
-                    voice.TTS(userposition_info);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<UserpositonData>> call, Throwable throwable) {
-                voice.TTS("실시간 열차정보를 받을 수 없습니다. ");
-            }
-        });
-
-    }
+//    // userposition 을 받기위한 리스트 선언
+//    ArrayList<Integer> usertrain = new ArrayList<>();
+//    ArrayList<String> usersta = new ArrayList<>();
+//    ArrayList<Integer> usertrain_clone = new ArrayList<>();
+//    ArrayList<String> usersta_clone = new ArrayList<>();
+//    public void request_getUserposition() {
+//        Call<List<UserpositonData>> getCall = serviceApi.get_userposition();
+//        getCall.enqueue(new Callback<List<UserpositonData>>() {
+//            @Override
+//            public void onResponse(Call<List<UserpositonData>> call, Response<List<UserpositonData>> response) {
+//                if (response.isSuccessful()) {
+//                    List<UserpositonData> userpositonData = response.body();
+//                    String result = "";
+//                    for (UserpositonData item : userpositonData) {
+//                        result += "실시간 열차 번호 : " + item.getusertrain()
+//                                + "\n실시간 열차위치(역) :" + item.getusersta();
+//
+//                        usertrain.add(item.getusertrain());
+//                        usersta.add(item.getusersta());
+//                    }
+//                    System.out.println(result);
+//                    usertrain_clone = (ArrayList<Integer>) usertrain.clone();
+//                    usersta_clone = (ArrayList<String>) usersta.clone();
+//                    usertrain.clear();
+//                    usersta.clear();
+//
+//                    int size = usertrain_clone.size();
+//                    String userposition_info = "";
+//                    for (int i = 0; i < size; i++) {
+//                        userposition_info += "실시간 열차 번호 : " + usertrain_clone.get(i) + "\n"
+//                                + "실시간 열차위치(역) :" + usersta_clone.get(i);
+//
+//                    }
+//                    System.out.println(userposition_info);
+//                    setUserPosition_info(userposition_info);
+//                    voice.TTS(userposition_info);
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<List<UserpositonData>> call, Throwable throwable) {
+//                voice.TTS("실시간 열차정보를 받을 수 없습니다. ");
+//            }
+//        });
+//
+//    }
 
     public void takepicture() {
 
