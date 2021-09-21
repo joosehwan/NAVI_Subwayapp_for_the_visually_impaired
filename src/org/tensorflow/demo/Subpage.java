@@ -273,8 +273,8 @@ public class Subpage extends Activity {
                     String userposition_info = "";
                     for (int i = 0; i < size; i++) {
                         userposition_info += "열차 번호 : " + usertrain_clone.get(i) + "\n"
-                                + "현재 열차가 [ " + usersta_clone.get(i)+" ] 에 있습니다.";
-
+                                + "현재 위치는 [ " + usersta_clone.get(i)+" ] 입니다.";
+//
                     }
                     System.out.println(userposition_info);
                     setUserPosition_info(userposition_info);

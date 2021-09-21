@@ -11,10 +11,9 @@
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="0sp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0sp"
-        android:layout_marginBottom="73sp"
+        android:layout_marginBottom="72dp"
         android:background="#FFDB6D"
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/textView"
@@ -46,16 +45,18 @@
 
     <EditText
         android:id="@+id/join_id"
-        android:layout_width="0sp"
-        android:layout_height="0sp"
-        android:layout_marginBottom="26sp"
+        android:layout_width="match_parent"
+        android:layout_height="56sp"
+        android:layout_marginLeft="40sp"
+        android:layout_marginRight="40sp"
+        android:layout_marginBottom="362dp"
         android:background="@drawable/edittext_style2"
         android:fontFamily="@font/gmarket"
         android:gravity="center"
         android:hint="  이름을 입력하세요"
-        app:layout_constraintBottom_toTopOf="@+id/join_password"
-        app:layout_constraintEnd_toEndOf="@+id/join_password"
-        app:layout_constraintStart_toStartOf="@+id/join_password"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2">
 
     </EditText>
@@ -63,78 +64,96 @@
     <Button
 
         android:id="@+id/join_button"
-        android:layout_width="0sp"
-        android:layout_height="60sp"
-        android:layout_marginStart="54sp"
-        android:layout_marginEnd="23sp"
+        android:layout_width="160dp"
+        android:layout_height="75dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginBottom="28dp"
         android:background="@drawable/button_style2"
         android:fontFamily="@font/gmarket"
         android:text="가입하기"
         android:textColor="#000000"
         android:textSize="20sp"
-        app:layout_constraintBaseline_toBaselineOf="@+id/join_cancel"
-        app:layout_constraintEnd_toStartOf="@+id/join_cancel"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+
+        android:id="@+id/join_cancel"
+        android:layout_width="160dp"
+        android:layout_height="75dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="28dp"
+        android:background="@drawable/button_style2"
+        android:fontFamily="@font/gmarket"
+        android:text="돌아가기"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <EditText
         android:id="@+id/join_password"
-        android:layout_width="0sp"
-        android:layout_height="0sp"
-        android:layout_marginBottom="29sp"
+        android:layout_width="match_parent"
+        android:layout_height="56sp"
+        android:layout_marginLeft="40sp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="40sp"
         android:background="@drawable/edittext_style2"
         android:fontFamily="@font/gmarket"
         android:gravity="center"
         android:hint="  비밀번호를 입력하세요"
         android:inputType="numberPassword"
-        app:layout_constraintBottom_toTopOf="@+id/join_pwck"
-        app:layout_constraintEnd_toEndOf="@+id/join_pwck"
-        app:layout_constraintStart_toStartOf="@+id/join_pwck"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/join_id">
 
     </EditText>
-
-    <Button
-
-        android:id="@+id/join_cancel"
-        android:layout_width="0sp"
-        android:layout_height="60sp"
-        android:layout_marginEnd="54sp"
-        android:layout_marginBottom="109sp"
-        android:background="@drawable/button_style2"
-        android:fontFamily="@font/gmarket"
-        android:text="돌아하기"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/join_button"
-        app:layout_constraintTop_toBottomOf="@+id/join_pwck" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5sp"
-        android:layout_marginBottom="16sp"
+        android:layout_marginBottom="22dp"
         android:fontFamily="@font/gmarket"
         android:text="회원정보를 입력해주세요"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/join_id"
-        app:layout_constraintStart_toStartOf="@+id/join_id"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.219"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <EditText
         android:id="@+id/join_pwck"
-        android:layout_width="0sp"
-        android:layout_height="0sp"
-        android:layout_marginBottom="46sp"
+        android:layout_width="match_parent"
+        android:layout_height="56sp"
+        android:layout_marginLeft="40sp"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="40sp"
         android:background="@drawable/edittext_style2"
         android:fontFamily="@font/gmarket"
         android:gravity="center"
         android:hint="  비밀번호을 다시 입력하세요"
         android:inputType="numberPassword"
-        app:layout_constraintBottom_toTopOf="@+id/join_cancel"
-        app:layout_constraintEnd_toEndOf="@+id/join_cancel"
-        app:layout_constraintStart_toStartOf="@+id/join_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/join_password">
+
+    </EditText>
+
+    <EditText
+        android:id="@+id/call_num"
+        android:layout_width="match_parent"
+        android:layout_height="56sp"
+        android:layout_marginLeft="40sp"
+        android:layout_marginTop="100dp"
+        android:layout_marginRight="40sp"
+        android:background="@drawable/edittext_style2"
+        android:fontFamily="@font/gmarket"
+        android:gravity="center"
+        android:hint="긴급전화번호를 설정하세요"
+        android:inputType="numberPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/join_password">
 
     </EditText>
@@ -143,7 +162,7 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="90sp"
+        android:layout_marginBottom="84dp"
         android:fontFamily="@font/gmarket"
         android:shadowColor="#000000"
         android:shadowDx="2.0"

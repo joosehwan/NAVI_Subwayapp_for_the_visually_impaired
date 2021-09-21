@@ -171,6 +171,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     private boolean yoloFirstStartFlag = false;
     public InstanceMatrix instanceMatrix = new InstanceMatrix();
     TensorFlowYoloDetector tensorFlowYoloDetector = new TensorFlowYoloDetector();
+    CameraConnectionFragment cameraConnectionFragment = new CameraConnectionFragment();
 
     //각종 변수--------------------------------------------------------------------------------------
 
@@ -253,7 +254,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         Button readocr = findViewById(R.id.readOCR);
         Button takesubway = findViewById(R.id.takesubway);
 
-
         soundPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
         soundID = soundPool.load(this, R.raw.voice_effect, 1);
 
@@ -273,13 +273,14 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
             @Override
             public void onClick(View v) {
                 try {
-                    if (src_post_data.isEmpty() != true && dst_post_data.isEmpty() != true) {
-                        startPost((new SubwayData(src_post_data, dst_post_data)));
-                    }
+//                    if (src_post_data.isEmpty() != true && dst_post_data.isEmpty() != true) {
+//                        startPost((new SubwayData(src_post_data, dst_post_data)));
+//                    }
+                    request_Getsubwaynum();
+
                 } catch (Exception e) {
 
                 }
-                request_Getsubwaynum();
             }
 
         });
@@ -290,12 +291,9 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                 Intent intent = new Intent(getApplicationContext(), Subpage.class);
                 System.out.println("time : " + getTime());
 
-
-
                 intent.putExtra("arrivalinfo", arrivalinfo);
 
                 intent.putExtra("transfer", Transfer_data_tosub);
-
 
                 startActivity(intent);
 
@@ -319,7 +317,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                     arr = new TreeSet<>(tensorFlowYoloDetector.clone);    // treeset에 labellist값 대입
                     Deduplicated_labellist = new ArrayList<String>(arr); //중복제거된 treeset을 다시대입
                     for (String i : Deduplicated_labellist) { //for문을 통한 전체출력
-                        System.out.println("제거 후 = " + i);
+//                        System.out.println("제거 후 = " + i);
                     }
                 }
                 String front = "";

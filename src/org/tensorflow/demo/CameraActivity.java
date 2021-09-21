@@ -38,7 +38,9 @@ import android.os.HandlerThread;
 import android.os.Trace;
 import android.util.Size;
 import android.view.Surface;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -87,11 +89,58 @@ public abstract class CameraActivity extends Activity
         setContentView(R.layout.activity_camera2);
 
         if (hasPermission()) {
-            setFragment();
+//            setFragment();
+            String cameraId = chooseCamera();
+            if (cameraId == null) {
+                Toast.makeText(this, "No Camera Detected", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            Fragment fragment;
+            if (useCamera2API) {
+                final CameraConnectionFragment camera2Fragment =
+                        CameraConnectionFragment.newInstance(
+                                new CameraConnectionFragment.ConnectionCallback() {
+                                    @Override
+                                    public void onPreviewSizeChosen(final Size size, final int rotation) {
+                                        previewHeight = size.getHeight();
+                                        previewWidth = size.getWidth();
+                                        CameraActivity.this.onPreviewSizeChosen(size, rotation);
+                                    }
+                                },
+                                this,
+                                getLayoutId(),
+                                getDesiredPreviewFrameSize(),
+                                this);
+
+                camera2Fragment.setCamera(cameraId);
+                fragment = camera2Fragment;
+                Button button = findViewById(R.id.capture);
+
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        camera2Fragment.takePicture();
+                    }
+                });
+            }
+
+
+            else {
+                fragment =
+                        new LegacyCameraConnectionFragment(this, getLayoutId(), getDesiredPreviewFrameSize());
+            }
+
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container, fragment)
+                    .commit();
+
             // Service Start
         } else {
             requestPermission();
         }
+
     }
 
 
@@ -160,9 +209,6 @@ public abstract class CameraActivity extends Activity
         processImage();
     }
 
-    /**
-     * Callback for Camera2 API
-     */
 
     @Override
     public void onImageAvailable(final ImageReader reader) {
@@ -367,40 +413,6 @@ public abstract class CameraActivity extends Activity
     }
 
     protected void setFragment() {
-        String cameraId = chooseCamera();
-        if (cameraId == null) {
-            Toast.makeText(this, "No Camera Detected", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
-        Fragment fragment;
-        if (useCamera2API) {
-            CameraConnectionFragment camera2Fragment =
-                    CameraConnectionFragment.newInstance(
-                            new CameraConnectionFragment.ConnectionCallback() {
-                                @Override
-                                public void onPreviewSizeChosen(final Size size, final int rotation) {
-                                    previewHeight = size.getHeight();
-                                    previewWidth = size.getWidth();
-                                    CameraActivity.this.onPreviewSizeChosen(size, rotation);
-                                }
-                            },
-                            this,
-                            getLayoutId(),
-                            getDesiredPreviewFrameSize(),
-                            this);
-
-            camera2Fragment.setCamera(cameraId);
-            fragment = camera2Fragment;
-        } else {
-            fragment =
-                    new LegacyCameraConnectionFragment(this, getLayoutId(), getDesiredPreviewFrameSize());
-        }
-
-        getFragmentManager()
-                .beginTransaction()
-                .replace(R.id.container, fragment)
-                .commit();
     }
 
     protected void fillBytes(final Plane[] planes, final byte[][] yuvBytes) {
