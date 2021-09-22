@@ -182,7 +182,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     private boolean yoloFirstStartFlag = false;
     public InstanceMatrix instanceMatrix = new InstanceMatrix();
     TensorFlowYoloDetector tensorFlowYoloDetector = new TensorFlowYoloDetector();
-    public CameraConnectionFragment cameraConnectionFragment = new CameraConnectionFragment();
+
 
     //각종 변수--------------------------------------------------------------------------------------
 
@@ -257,7 +257,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
 
     @Override
-    protected void onCreate(final Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         serviceApi = RetrofitClient.getClient().create(ServiceApi.class);
@@ -315,20 +315,46 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
             }
         });
 
+        final CameraActivity cameraActivity = new CameraActivity() {
+            @Override
+            protected void processImage() {
 
+            }
+
+            @Override
+            protected void onPreviewSizeChosen(Size size, int rotation) {
+
+            }
+
+            @Override
+            protected int getLayoutId() {
+                return 0;
+            }
+
+            @Override
+            protected Size getDesiredPreviewFrameSize() {
+                return null;
+            }
+        };
         detectedClass.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                if (tensorFlowYoloDetector.clone == null) {
-                    takepicture();
 
+                try {
+                  camera2Fragment.takePicture();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if (tensorFlowYoloDetector.clone == null) {
                     try {
                         voice.TTS("전방 내용없음.");
                     } catch (Exception e) {
                         Log.e("", "인식된값없음");
                     }
                 } else {
+
                     // TreeSet으로 리스트 중복제거.
                     arr = new TreeSet<>(tensorFlowYoloDetector.clone);    // treeset에 labellist값 대입
                     Deduplicated_labellist = new ArrayList<String>(arr); //중복제거된 treeset을 다시대입
