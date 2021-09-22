@@ -123,9 +123,10 @@ android {
         release.setRoot('build-types/release')
     }
     defaultConfig {
-        targetSdkVersion 30
+        targetSdkVersion 27
         minSdkVersion 21
     }
+    buildToolsVersion '28.0.2'
 }
 
 task buildNativeBazel(type: Exec) {

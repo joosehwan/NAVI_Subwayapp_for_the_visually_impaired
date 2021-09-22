@@ -17,6 +17,7 @@
 package org.tensorflow.demo;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -37,6 +38,7 @@ import android.media.ImageReader.OnImageAvailableListener;
 import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -49,11 +51,14 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -93,6 +98,9 @@ import org.tensorflow.demo.vision_module.Service;
 import org.tensorflow.demo.vision_module.Voice;
 import org.tensorflow.demo.vision_module.senario;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -128,9 +136,11 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     private static final String YOLO_INPUT_NAME = "input";
     private static final String YOLO_OUTPUT_NAMES = "output";
     private static final int YOLO_BLOCK_SIZE = 32;
+
     private enum DetectorMode {
         YOLO;
     }
+
     private static final DetectorMode MODE = DetectorMode.YOLO;
     // Minimum detection confidence to track a detection.
     public static final float MINIMUM_CONFIDENCE_YOLO = 0.5f;
@@ -156,7 +166,8 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     private Matrix frameToCropTransform;
     private Matrix cropToFrameTransform;
     public MultiBoxTracker tracker;
-    private OverlayView trackingOverlay;
+    public OverlayView trackingOverlay;
+
     private byte[] luminanceCopy;
     private BorderedText borderedText;
     private RequestQueue requestQueue;
@@ -171,7 +182,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     private boolean yoloFirstStartFlag = false;
     public InstanceMatrix instanceMatrix = new InstanceMatrix();
     TensorFlowYoloDetector tensorFlowYoloDetector = new TensorFlowYoloDetector();
-    CameraConnectionFragment cameraConnectionFragment = new CameraConnectionFragment();
+    public CameraConnectionFragment cameraConnectionFragment = new CameraConnectionFragment();
 
     //각종 변수--------------------------------------------------------------------------------------
 
@@ -210,16 +221,17 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     private String Dst_gpsY;
     String transfer_data = "";
     static String Transfer_data_tosub = "";
+
     public void setTransfer_data_tosub(String transfer_data_tosub) {
         Transfer_data_tosub = transfer_data_tosub;
     }
 
     //request_Getsubwaynum의 결과를 저장해주는 변수-----------------------------------------------------
     static String arrivalinfo = "";
+
     public static void setArrivalinfo(String arrivalinfo) {
         DetectorActivity.arrivalinfo = arrivalinfo;
     }
-
 
 
     //post로 보낼 src데이터
@@ -242,6 +254,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     private boolean isScanning;
 
     UserRssi comp = new UserRssi();
+
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -304,9 +317,12 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
 
         detectedClass.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 if (tensorFlowYoloDetector.clone == null) {
+                    takepicture();
+
                     try {
                         voice.TTS("전방 내용없음.");
                     } catch (Exception e) {
@@ -638,6 +654,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
     }
 
+
     @Override
     protected int getLayoutId() {
         return R.layout.camera_connection_fragment_tracking;
@@ -860,7 +877,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 //
 //
 //          1.출발지와 목적지가 정확하다면 현재시각과 출발역을 서버로 post통신한다
-             new Thread(new Runnable() {
+                            new Thread(new Runnable() {
 
                                 @Override
                                 public void run() {
@@ -1061,8 +1078,8 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 //            디버그창 띄우는 코드
 //            requestRender();
 //            onSetDebug(debug);
-          // request_getUserposition();
-           // request_Getsubwaynum();
+            // request_getUserposition();
+            // request_Getsubwaynum();
             request_getTransportData();
             return true;
 
@@ -1390,6 +1407,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 //        });
 //
 //    }
+
 
     public void takepicture() {
 

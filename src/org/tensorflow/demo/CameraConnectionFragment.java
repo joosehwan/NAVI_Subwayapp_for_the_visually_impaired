@@ -27,6 +27,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Point;
@@ -47,6 +49,7 @@ import android.media.ImageReader;
 import android.media.ImageReader.OnImageAvailableListener;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.text.TextUtils;
@@ -68,8 +71,10 @@ import androidx.core.content.ContextCompat;
 import org.tensorflow.demo.env.Logger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,6 +109,7 @@ public class CameraConnectionFragment extends Fragment implements ActivityCompat
         ORIENTATIONS.append(Surface.ROTATION_180, 270);
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
     }
+
     /**
      * Tag for the {@link Log}.
      */
@@ -175,6 +181,9 @@ public class CameraConnectionFragment extends Fragment implements ActivityCompat
     public CameraConnectionFragment() {
 
     }
+
+
+
 
 
     /**
@@ -257,7 +266,7 @@ public class CameraConnectionFragment extends Fragment implements ActivityCompat
      * An {@link ImageReader} that handles preview frame capture.
      */
     private ImageReader previewReader;
-
+    private ImageReader mImageReader;
     private File mFile;
 
     private final ImageReader.OnImageAvailableListener onImageAvailableListener
@@ -269,7 +278,6 @@ public class CameraConnectionFragment extends Fragment implements ActivityCompat
         }
 
     };
-
 
 
     /**
@@ -393,7 +401,7 @@ public class CameraConnectionFragment extends Fragment implements ActivityCompat
      * @param height  The minimum desired height
      * @return The optimal {@code Size}, or an arbitrary one if none were big enough
      */
-    protected static Size chooseOptimalSize(Size[] choices, int width,int height) {
+    protected static Size chooseOptimalSize(Size[] choices, int width, int height) {
         final int minSize = Math.max(Math.min(width, height), MINIMUM_PREVIEW_SIZE);
         final Size desiredSize = new Size(width, height);
 
@@ -481,18 +489,21 @@ public class CameraConnectionFragment extends Fragment implements ActivityCompat
         return inflater.inflate(layout, container, false);
 
     }
+
     @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         textureView = (AutoFitTextureView) view.findViewById(R.id.texture);
 
     }
+
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.e("d", String.valueOf(savedInstanceState));
 
 
-        mFile = new File(getActivity().getExternalFilesDir(null), "pic.jpg");
+        mFile = new File(getActivity().getExternalFilesDir(null), "capture.jpg");
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -574,6 +585,12 @@ public class CameraConnectionFragment extends Fragment implements ActivityCompat
                 previewReader.setOnImageAvailableListener(
                         onImageAvailableListener, backgroundHandler);
 
+//                mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
+//                        ImageFormat.JPEG, /*maxImages*/2);
+//                mImageReader.setOnImageAvailableListener(
+//                        onImageAvailableListener, backgroundHandler);
+
+
                 int displayRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
                 sensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
 
@@ -633,9 +650,9 @@ public class CameraConnectionFragment extends Fragment implements ActivityCompat
                             previewSize.getHeight(), previewSize.getWidth());
                 }
             }
-        } catch(CameraAccessException e){
+        } catch (CameraAccessException e) {
             LOGGER.e(e, "Exception!");
-        } catch(NullPointerException e){
+        } catch (NullPointerException e) {
             // Currently an NPE is thrown when the Camera2API is used but not supported on the
             // device this code runs.
             // TODO(andrewharp): abstract ErrorDialog/RuntimeException handling out into new method and
@@ -750,6 +767,7 @@ public class CameraConnectionFragment extends Fragment implements ActivityCompat
                     ImageReader.newInstance(
                             previewSize.getWidth(), previewSize.getHeight(), ImageFormat.YUV_420_888, 2);
 
+//
             previewReader.setOnImageAvailableListener(imageListener, backgroundHandler);
             previewRequestBuilder.addTarget(previewReader.getSurface());
 
@@ -829,21 +847,21 @@ public class CameraConnectionFragment extends Fragment implements ActivityCompat
         }
         textureView.setTransform(matrix);
     }
-    public void show(){
+
+    public void show() {
         System.out.println("takePicture 사용 가능");
     }
 
     Handler delayHandler = new Handler();
-    public void takePicture() {
-        delayHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("capture");
-                lockFocus();
-            }
-        },3000);
 
+    public void takePicture() throws InterruptedException {
+
+        System.out.println("capture");
+//        captureActivity(getActivity());
+        captureView(textureView);
+//        lockFocus();
     }
+
 
     /**
      * Lock the focus as the first step for a still image capture.
@@ -915,6 +933,7 @@ public class CameraConnectionFragment extends Fragment implements ActivityCompat
                                                @NonNull TotalCaptureResult result) {
                     showToast("Saved: " + mFile);
                     Log.d(TAG, mFile.toString());
+                    Log.d(TAG, mFile.getAbsolutePath());
                     unlockFocus();
                 }
             };
@@ -973,12 +992,52 @@ public class CameraConnectionFragment extends Fragment implements ActivityCompat
 //        }
 //    }
 
-  /*private void setAutoFlash(CaptureRequest.Builder requestBuilder) {
-    if (mFlashSupported) {
-      requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
-              CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+    /*private void setAutoFlash(CaptureRequest.Builder requestBuilder) {
+      if (mFlashSupported) {
+        requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+      }
+    } */
+    public static void captureView(View v) throws InterruptedException {
+
+        v.setDrawingCacheEnabled(true);
+        v.buildDrawingCache(true);
+//
+        Bitmap captureView = Bitmap.createBitmap( v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
+
+        if(v instanceof TextureView){
+            captureView =((TextureView) v).getBitmap();
+        }
+       else{
+            Canvas screenshotCanvas = new Canvas(captureView);
+            v.draw(screenshotCanvas);
+        }
+
+
+        FileOutputStream fos;
+
+        String strFolderPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Capture";
+        System.out.println("파일경로 : " + strFolderPath);
+        File folder = new File(strFolderPath);
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+
+        String strFilePath = strFolderPath + "/" + "capture" + ".jpg";
+        File fileCacheItem = new File(strFilePath);
+
+        try {
+            fos = new FileOutputStream(fileCacheItem);
+
+            captureView.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            System.out.println("파일 생성 성공");
+            Toast.makeText(v.getContext(), "캡처 성공",Toast.LENGTH_SHORT).show();
+            v.setDrawingCacheEnabled(false);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
-  } */
 
     /**
      * Saves a JPEG {@link Image} into the specified {@link File}.
@@ -1001,13 +1060,16 @@ public class CameraConnectionFragment extends Fragment implements ActivityCompat
 
         @Override
         public void run() {
+
             ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
             byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);
             FileOutputStream output = null;
+
             try {
                 output = new FileOutputStream(mFile);
                 output.write(bytes);
+
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
@@ -1023,6 +1085,8 @@ public class CameraConnectionFragment extends Fragment implements ActivityCompat
         }
 
     }
+
+
     /**
      * Compares two {@code Size}s based on their areas.
      */
