@@ -78,6 +78,8 @@ import com.minew.beacon.MinewBeaconManager;
 import org.tensorflow.demo.OverlayView.DrawCallback;
 import org.tensorflow.demo.blescan.BeaconListAdapter;
 import org.tensorflow.demo.blescan.UserRssi;
+import org.tensorflow.demo.data.OcrResponse;
+import org.tensorflow.demo.data.Ocrdata;
 import org.tensorflow.demo.data.SubwayData;
 import org.tensorflow.demo.data.SubwayResponse;
 import org.tensorflow.demo.data.Subwayapi;
@@ -109,6 +111,9 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -336,13 +341,15 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                 return null;
             }
         };
+
         detectedClass.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-
+                String strFolderPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Capture/capture.jpg";
+                    post_ocr_data();
                 try {
-                  camera2Fragment.takePicture();
+                    camera2Fragment.takePicture();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -1435,7 +1442,32 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 //    }
 
 
-    public void takepicture() {
+    //OCR이미지를 post하는 함수
+    public void post_ocr_data() {
+        File mFile;
+        String strFolderPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Capture/capture.jpg";
+        mFile = new File(strFolderPath);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"),mFile);
+        MultipartBody.Part fileToupload= MultipartBody.Part.createFormData("image", "capture.jpg",requestBody);
+       serviceApi.ocr_data(fileToupload).enqueue(new Callback<OcrResponse>() {
+           @Override
+           public void onResponse(Call<OcrResponse> call, Response<OcrResponse> response) {
+                OcrResponse result = response.body();
+                if(response.isSuccessful()){
+                    String result_body = new Gson().toJson(response.body());
+                    System.out.println(result_body + " = 이미지");
+                    System.out.println(result.toString() + "이미지");
+                }else{
+                    System.out.println("이미지 삽입 실패");
+                }
+           }
+
+           @Override
+           public void onFailure(Call<OcrResponse> call, Throwable throwable) {
+                System.out.println(throwable.getMessage());
+           }
+       });
 
     }
+
 }

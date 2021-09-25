@@ -39,6 +39,7 @@ public class MainActivity extends Activity {
     private boolean mIsRefreshing;
     private int state;
     private TextView textView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +49,6 @@ public class MainActivity extends Activity {
         initManager();
         checkBluetooth();
         initListener();
-
     }
 
     /**
