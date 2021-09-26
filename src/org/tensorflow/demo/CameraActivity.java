@@ -129,20 +129,7 @@ public abstract class CameraActivity extends Activity
 
                 camera2Fragment.setCamera(cameraId);
                 fragment = camera2Fragment;
-                Button button = findViewById(R.id.capture);
-
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        try {
-                            camera2Fragment.takePicture();
-
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
+               
             } else {
                 fragment =
                         new LegacyCameraConnectionFragment(this, getLayoutId(), getDesiredPreviewFrameSize());

@@ -346,15 +346,9 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
             @Override
             public void onClick(View v) {
-                String strFolderPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Capture/capture.jpg";
-                    post_ocr_data();
-                try {
-                    camera2Fragment.takePicture();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
 
                 if (tensorFlowYoloDetector.clone == null) {
+
                     try {
                         voice.TTS("전방 내용없음.");
                     } catch (Exception e) {
@@ -365,25 +359,64 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                     // TreeSet으로 리스트 중복제거.
                     arr = new TreeSet<>(tensorFlowYoloDetector.clone);    // treeset에 labellist값 대입
                     Deduplicated_labellist = new ArrayList<String>(arr); //중복제거된 treeset을 다시대입
-                    for (String i : Deduplicated_labellist) { //for문을 통한 전체출력
-//                        System.out.println("제거 후 = " + i);
+
+                    String signText = "sign";
+                    if (Deduplicated_labellist.contains(signText)) {
+                        try {
+                            camera2Fragment.takePicture();
+
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
                 String front = "";
+                String changeResult = "";
                 try {
                     for (int i = 0; i < Deduplicated_labellist.size(); i++) {
-                        front += Deduplicated_labellist.get(i) + "  ";
+
+                        switch (Deduplicated_labellist.get(i)) {
+                            case "elevator":
+                                changeResult = "엘레베이터";
+                                break;
+                            case "turnstile":
+                                changeResult = "개찰구";
+                                break;
+                            case "chair":
+                                changeResult = "의자";
+                                break;
+                            case "stairs":
+                                changeResult = "계단";
+                                break;
+                            case "escalator":
+                                changeResult = "에스컬레이터";
+                                break;
+                            case "toilet":
+                                changeResult = "화장실";
+                                break;
+                            case "sign":
+                                changeResult = "이정표";
+                                break;
+                            case "number":
+                                changeResult = "번호칸";
+                                break;
+                            default:
+                                break;
+                        }
+                        front += changeResult + "  ";
+
                     }
                 } catch (Exception e) {
                     voice.TTS("전방 내용없음.");
                 }
+
 
                 ocrtext.setText(front);
                 if (front.isEmpty() == true) {
                     voice.TTS("전방에 장애물이 없습니다");
                     ocrtext.setText("전방에 장애물이 없습니다");
                 } else {
-                    voice.TTS("전방에" + front + "들이 있습니다.");
+                    voice.TTS("  전방에" + front + "들이 있습니다.");
                 }
 
 
@@ -1447,26 +1480,26 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         File mFile;
         String strFolderPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Capture/capture.jpg";
         mFile = new File(strFolderPath);
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"),mFile);
-        MultipartBody.Part fileToupload= MultipartBody.Part.createFormData("image", "capture.jpg",requestBody);
-       serviceApi.ocr_data(fileToupload).enqueue(new Callback<OcrResponse>() {
-           @Override
-           public void onResponse(Call<OcrResponse> call, Response<OcrResponse> response) {
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), mFile);
+        MultipartBody.Part fileToupload = MultipartBody.Part.createFormData("image", "capture.jpg", requestBody);
+        serviceApi.ocr_data(fileToupload).enqueue(new Callback<OcrResponse>() {
+            @Override
+            public void onResponse(Call<OcrResponse> call, Response<OcrResponse> response) {
                 OcrResponse result = response.body();
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     String result_body = new Gson().toJson(response.body());
                     System.out.println(result_body + " = 이미지");
                     System.out.println(result.toString() + "이미지");
-                }else{
+                } else {
                     System.out.println("이미지 삽입 실패");
                 }
-           }
+            }
 
-           @Override
-           public void onFailure(Call<OcrResponse> call, Throwable throwable) {
+            @Override
+            public void onFailure(Call<OcrResponse> call, Throwable throwable) {
                 System.out.println(throwable.getMessage());
-           }
-       });
+            }
+        });
 
     }
 
@@ -1475,18 +1508,18 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         File mFile;
         String strFolderPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Capture/capture.jpg";
         mFile = new File(strFolderPath);
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"),mFile);
-        MultipartBody.Part fileToupload= MultipartBody.Part.createFormData("image", "capture.jpg",requestBody);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), mFile);
+        MultipartBody.Part fileToupload = MultipartBody.Part.createFormData("image", "capture.jpg", requestBody);
         serviceApi.put_ocr_data(fileToupload).enqueue(new Callback<OcrResponse>() {
             @Override
             public void onResponse(Call<OcrResponse> call, Response<OcrResponse> response) {
                 OcrResponse result = response.body();
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     String result_body = new Gson().toJson(response.body());
                     System.out.println(result_body + " = 이미지");
                     System.out.println(result.toString() + "이미지");
                     System.out.println("PUT 성공");
-                }else{
+                } else {
                     System.out.println("이미지 업데이트 실패");
                 }
             }
@@ -1501,18 +1534,18 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
     //OCR의 결과를 Get 하는 함수
 
-    public  void get_ocr_data(){
-        Call<List<Ocrdata>> getCall =serviceApi.get_ocr_data();
+    public void get_ocr_data() {
+        Call<List<Ocrdata>> getCall = serviceApi.get_ocr_data();
         getCall.enqueue(new Callback<List<Ocrdata>>() {
             @Override
             public void onResponse(Call<List<Ocrdata>> call, Response<List<Ocrdata>> response) {
-                String result="";
-                if (response.isSuccessful()){
+                String result = "";
+                if (response.isSuccessful()) {
                     List<Ocrdata> ocrdata = response.body();
-                    for(Ocrdata item : ocrdata){
-                        result+= item.getTitle();
+                    for (Ocrdata item : ocrdata) {
+                        result += item.getTitle();
                     }
-                    System.out.println("OCR 판독 결과값 : "+result);
+                    System.out.println("OCR 판독 결과값 : " + result);
                 }
             }
 

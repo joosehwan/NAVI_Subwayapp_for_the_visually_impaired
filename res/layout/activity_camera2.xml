@@ -129,17 +129,6 @@
         app:layout_constraintEnd_toEndOf="parent"></Button>
 
     <Button
-        android:id="@+id/capture"
-        android:layout_width="175dp"
-        android:layout_height="156dp"
-        android:layout_marginBottom="4dp"
-        android:text="캡처"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.47"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
         android:id="@+id/readOCR"
         android:layout_width="175sp"
         android:layout_height="60sp"
