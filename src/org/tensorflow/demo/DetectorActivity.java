@@ -1470,4 +1470,57 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
     }
 
+    //OCR이미지를 update하는 함수
+    public void put_ocr_data() {
+        File mFile;
+        String strFolderPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Capture/capture.jpg";
+        mFile = new File(strFolderPath);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"),mFile);
+        MultipartBody.Part fileToupload= MultipartBody.Part.createFormData("image", "capture.jpg",requestBody);
+        serviceApi.put_ocr_data(fileToupload).enqueue(new Callback<OcrResponse>() {
+            @Override
+            public void onResponse(Call<OcrResponse> call, Response<OcrResponse> response) {
+                OcrResponse result = response.body();
+                if(response.isSuccessful()){
+                    String result_body = new Gson().toJson(response.body());
+                    System.out.println(result_body + " = 이미지");
+                    System.out.println(result.toString() + "이미지");
+                    System.out.println("PUT 성공");
+                }else{
+                    System.out.println("이미지 업데이트 실패");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<OcrResponse> call, Throwable throwable) {
+                System.out.println(throwable.getMessage());
+            }
+        });
+
+    }
+
+    //OCR의 결과를 Get 하는 함수
+
+    public  void get_ocr_data(){
+        Call<List<Ocrdata>> getCall =serviceApi.get_ocr_data();
+        getCall.enqueue(new Callback<List<Ocrdata>>() {
+            @Override
+            public void onResponse(Call<List<Ocrdata>> call, Response<List<Ocrdata>> response) {
+                String result="";
+                if (response.isSuccessful()){
+                    List<Ocrdata> ocrdata = response.body();
+                    for(Ocrdata item : ocrdata){
+                        result+= item.getTitle();
+                    }
+                    System.out.println("OCR 판독 결과값 : "+result);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Ocrdata>> call, Throwable throwable) {
+
+            }
+        });
+    }
+
 }

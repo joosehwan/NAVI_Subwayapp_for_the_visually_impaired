@@ -20,6 +20,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
 
 public interface ServiceApi {
@@ -35,6 +36,13 @@ public interface ServiceApi {
     @Multipart
     @POST("/ocrimg/")
     Call<OcrResponse> ocr_data(@Part MultipartBody.Part data);
+
+    @Multipart
+    @PUT("/ocrimg/")
+    Call<OcrResponse> put_ocr_data(@Part MultipartBody.Part data);
+
+    @GET("/ocrimg/")
+    Call<List<Ocrdata>> get_ocr_data();
 
     @GET("/arrival/")
     Call<List<TrainNum>> get_trainnum();
