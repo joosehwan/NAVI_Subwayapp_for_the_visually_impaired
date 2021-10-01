@@ -73,10 +73,15 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
+import com.minew.beacon.BeaconValueIndex;
+import com.minew.beacon.BluetoothState;
 import com.minew.beacon.MinewBeaconManager;
+import com.minew.beacon.MinewBeacon;
+import com.minew.beacon.MinewBeaconManagerListener;
 
 import org.tensorflow.demo.OverlayView.DrawCallback;
 import org.tensorflow.demo.blescan.BeaconListAdapter;
+import org.tensorflow.demo.blescan.MainActivity;
 import org.tensorflow.demo.blescan.UserRssi;
 import org.tensorflow.demo.data.OcrResponse;
 import org.tensorflow.demo.data.Ocrdata;
@@ -105,6 +110,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -257,9 +263,20 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     private BeaconListAdapter mAdapter;
     private static final int REQUEST_ENABLE_BT = 2;
     private boolean isScanning;
-
     UserRssi comp = new UserRssi();
-
+    ArrayList<String> uuuid = new ArrayList<String>();
+    ArrayList<String> rsssi = new ArrayList<String>();
+    ArrayList<String> ttx_power = new ArrayList<String>();
+    ArrayList<Double> values = new ArrayList<Double>();
+    ArrayList<String> BeaconName = new ArrayList<String>();
+    ArrayList<String> nBeacon = new ArrayList<String>();
+    //클론할 비콘
+    ArrayList<String> uuuid_clone = new ArrayList<String>();
+    ArrayList<String> rsssi_clone = new ArrayList<String>();
+    ArrayList<String> ttx_power_clone = new ArrayList<String>();
+    ArrayList<Double> values_clone = new ArrayList<Double>();
+    ArrayList<String> BeaconName_clone = new ArrayList<String>();
+    private int state;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -278,6 +295,12 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         final TextView ocrtext = findViewById(R.id.cameraOCR);
         final TextView detectedClass = findViewById(R.id.cameraclick);
         Button goSub = findViewById(R.id.goto_subpage);
+        initView();
+        initManager();
+        initListener();
+        checkBluetooth();
+
+
 
         readocr.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -364,6 +387,16 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                     if (Deduplicated_labellist.contains(signText)) {
                         try {
                             camera2Fragment.takePicture();
+                            post_ocr_data();
+                            new Handler().postDelayed(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {   get_ocr_data();//딜레이 후 시작할 코드 작성
+                                    System.out.println("1초 딜레이");
+
+                                }
+                            }, 2000);
 
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -1256,6 +1289,8 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         voice.close();
     }
 
+
+
     //  현재 시간을 받아오는 함수
     private String getTime() {
         long now = System.currentTimeMillis();
@@ -1287,6 +1322,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
             }
         });
     }
+
 
     //  request_Getsubwaynum의 리스트
     ArrayList<String> request_station = new ArrayList<String>();
@@ -1490,6 +1526,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                     String result_body = new Gson().toJson(response.body());
                     System.out.println(result_body + " = 이미지");
                     System.out.println(result.toString() + "이미지");
+
                 } else {
                     System.out.println("이미지 삽입 실패");
                 }
@@ -1546,6 +1583,9 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                         result += item.getTitle();
                     }
                     System.out.println("OCR 판독 결과값 : " + result);
+                    voice.TTS(result+" 문자가 인식 됨");
+                }else{
+                    System.out.println("문자 받아오기 실패");
                 }
             }
 
@@ -1555,5 +1595,184 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
             }
         });
     }
+    private void initView() {
+        mAdapter = new BeaconListAdapter();
+    }
+    private void initManager() {
+        mMinewBeaconManager = mMinewBeaconManager.getInstance(this);
+    }
+    private void initListener() {
+        if (mMinewBeaconManager != null) {
+            BluetoothState bluetoothState = mMinewBeaconManager.checkBluetoothState();
+            switch (bluetoothState) {
+                case BluetoothStateNotSupported:
+                    finish();
+                    break;
+                case BluetoothStatePowerOff:
+                   ;
+                    return;
+                case BluetoothStatePowerOn:
+                    break;
+            }
+        }
+        try {
+            mMinewBeaconManager.startScan();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        mMinewBeaconManager.setDeviceManagerDelegateListener(new MinewBeaconManagerListener() {
+            /**
+             *   if the manager find some new beacon, it will call back this method.
+             *
+             *  @param minewBeacons  new beacons the manager scanned
+             */
+            @Override
+            public void onAppearBeacons(List<MinewBeacon> minewBeacons) {
+                for (MinewBeacon minewBeacon : minewBeacons) {
+                    String deviceName = minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue();
+//                            Toast.makeText(getApplicationContext(), deviceName + "  on range", Toast.LENGTH_SHORT).show();
+
+                    System.out.println("on appear name : " + minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_Name).getStringValue());
+                    System.out.println("on appear name : " + minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue());
+                }
+            }
+
+            /**
+             *  if a beacon didn't update data in 10 seconds, we think this beacon is out of rang, the manager will call back this method.
+             *
+             *  @param minewBeacons beacons out of range
+             */
+            @Override
+            public void onDisappearBeacons(List<MinewBeacon> minewBeacons) {
+                /*for (MinewBeacon minewBeacon : minewBeacons) {
+                    String deviceName = minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_Name).getStringValue();
+                    Toast.makeText(getApplicationContext(), deviceName + "  out range", Toast.LENGTH_SHORT).show();
+                }*/
+            }
+
+            /**
+             *  the manager calls back this method every 1 seconds, you can get all scanned beacons.
+             *
+             *  @param minewBeacons all scanned beacons
+             */
+            @Override
+            public void onRangeBeacons(final List<MinewBeacon> minewBeacons) {
+                final ArrayList<String> stacompare = new ArrayList<String>();
+                stacompare.add("74278BDA-B644-4520-8F0C-720EAF059935");
+                stacompare.add("AB8190D5-D11E-4941-ACC4-42F30510B408");
+                stacompare.add("FDA50693-A4E2-4FB1-AFCF-C6EB07647825");
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Collections.sort(minewBeacons, comp);
+                        Log.e("tag", state + "");
+                        if (state == 1 || state == 2) {
+                        } else {
+                            mAdapter.setItems(minewBeacons);
+                        }
+                        for (MinewBeacon minewBeacon : minewBeacons) {
+                            String deviceName = minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue();
+//                            Toast.makeText(getApplicationContext(), deviceName + "  on range", Toast.LENGTH_SHORT).show();
+//                            System.out.println("on range UUID : " + minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue());
+//                            System.out.println("on range RSSI : " + minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_RSSI).getStringValue());
+                            double d = ((-50 - (double) minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_RSSI).getIntValue()) / 20.0);
+                            d = Math.pow(10.0, d);
+//                          d=Math.round(d*100)/100;
+//
+                            if (minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue().contains("FDA50693") == true) {
+                                BeaconName.add("화장실");
+                            } else if (minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue().contains("AB8190D5") == true) {
+                                BeaconName.add("엘레베이터");
+                            } else if (minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue().contains("74278BDA") == true) {
+                                BeaconName.add("개찰구");
+                            }
+
+                            values.add(d);
+// 기존의 비콘 = BeaconName_clone new 비콘 = nBeacon
+                            System.out.println("d의값=" + d);
+                            System.out.println(mAdapter.getItemCount());
+                            if (stacompare.contains(minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue()) == true) {
+                                uuuid.add(minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue());
+                                rsssi.add(minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_RSSI).getStringValue());
+                                ttx_power.add(minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_TxPower).getStringValue());
+                            }
+
+                            if (mAdapter.getItemCount() == values.size()) {
+                                uuuid_clone = (ArrayList<String>) uuuid.clone();
+                                values_clone = (ArrayList<Double>) values.clone();
+                                BeaconName_clone = (ArrayList<String>) BeaconName.clone();
+                                values.clear();
+                                uuuid.clear();
+                                BeaconName.clear();
+
+                                Collections.sort(BeaconName_clone);
+
+                                String past = "";
+                                String current = "";
+
+                                for(String value : BeaconName_clone){
+                                    past += value;
+                                }
+                                System.out.println("past = " + past);
+                                for(String value : nBeacon){
+                                    current += value;
+                                }
+
+                                System.out.println("current = " + current);
+                                if (past.equals(current)) {
+                                    System.out.println("비콘 변화 X");
+                                }
+                                else if(current.isEmpty() == true){
+                                    voice.TTS("주변에 " + past +  "가 있습니다");
+                                }
+                                else {
+                                    voice.TTS("주변에 " + current +"가 있습니다");
+                                }
+
+
+                                nBeacon = (ArrayList<String>) BeaconName_clone.clone();
+                            }
+                        }
+                    }
+                });
+
+            }
+
+            /**
+             *  the manager calls back this method when BluetoothStateChanged.
+             *
+             *  @param state BluetoothState
+             */
+            @Override
+            public void onUpdateState(BluetoothState state) {
+                switch (state) {
+                    case BluetoothStatePowerOn:
+                        Toast.makeText(getApplicationContext(), "BluetoothStatePowerOn", Toast.LENGTH_SHORT).show();
+                        break;
+                    case BluetoothStatePowerOff:
+                        Toast.makeText(getApplicationContext(), "BluetoothStatePowerOff", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        });
+    }
+    public void checkBluetooth() {
+        BluetoothState bluetoothState = mMinewBeaconManager.checkBluetoothState();
+        switch (bluetoothState) {
+            case BluetoothStateNotSupported:
+                finish();
+                break;
+            case BluetoothStatePowerOff:
+
+                break;
+            case BluetoothStatePowerOn:
+                break;
+        }
+    }
+
 
 }
+

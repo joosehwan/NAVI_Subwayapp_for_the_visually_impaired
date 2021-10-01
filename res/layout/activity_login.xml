@@ -61,7 +61,7 @@
         android:background="@drawable/button_style2"
         android:fontFamily="@font/gmarket"
         android:gravity="center"
-
+        android:visibility="gone"
         android:text="블루투스"
         android:textColor="#000000"
         android:textSize="20sp"

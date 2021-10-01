@@ -148,8 +148,6 @@ public abstract class CameraActivity extends Activity
 
     }
 
-
-
     private byte[] lastPreviewFrame;
 
     protected int[] getRgbBytes() {
