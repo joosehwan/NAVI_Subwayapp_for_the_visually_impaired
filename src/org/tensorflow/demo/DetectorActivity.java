@@ -195,7 +195,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     public InstanceMatrix instanceMatrix = new InstanceMatrix();
     TensorFlowYoloDetector tensorFlowYoloDetector = new TensorFlowYoloDetector();
 
-
     //각종 변수--------------------------------------------------------------------------------------
 
 
@@ -223,15 +222,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
 
     // 환승역 api에 사용되는 변수----------------------------------------------------------------------
-    static String src_gps_x;
-    static String src_gps_y;
-    static String dst_gps_x;
-    static String dst_gps_y;
-    private String Src_gpsX;
-    private String Src_gpsY;
-    private String Dst_gpsX;
-    private String Dst_gpsY;
-    String transfer_data = "";
     static String Transfer_data_tosub = "";
 
     public void setTransfer_data_tosub(String transfer_data_tosub) {
@@ -245,15 +235,8 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         DetectorActivity.arrivalinfo = arrivalinfo;
     }
 
-
-    //post로 보낼 src데이터
-    String src_post_data;
-    String dst_post_data;
     //restapi 서버 통신 객체 선언
     public ServiceApi serviceApi;
-
-    //공공데이터 인증키
-    final static String key = "zWzMth1ANw2%2F4ne5OjB8q8nqI4E%2Bzd6niSgLNpkcx1Y8IaSzo8fbu6IaR%2FfDtQhHpldYIdgtQwna%2FdXSCvgkHg%3D%3D";
 
     //지하철api 객체선언
     Subwayapi subwayapi = new Subwayapi();
@@ -263,8 +246,8 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     private MinewBeaconManager mMinewBeaconManager;
     private BeaconListAdapter mAdapter;
     private static final int REQUEST_ENABLE_BT = 2;
-    private boolean isScanning;
     UserRssi comp = new UserRssi();
+
     ArrayList<String> uuuid = new ArrayList<String>();
     ArrayList<String> rsssi = new ArrayList<String>();
     ArrayList<String> ttx_power = new ArrayList<String>();
@@ -314,9 +297,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
             @Override
             public void onClick(View v) {
                 try {
-//                    if (src_post_data.isEmpty() != true && dst_post_data.isEmpty() != true) {
-//                        startPost((new SubwayData(src_post_data, dst_post_data)));
-//                    }
                     request_Getsubwaynum();
 
                 } catch (Exception e) {
@@ -379,7 +359,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
                     }
                 }, 5000);
-
 
                 if (tensorFlowYoloDetector.clone == null) {
 
@@ -455,7 +434,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                     voice.TTS("전방 내용없음.");
                 }
 
-
                 ocrtext.setText(front);
                 if (front.isEmpty() == true) {
                     voice.TTS("전방에 장애물이 없습니다");
@@ -471,8 +449,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         Intent get_intent = getIntent();    //값을 받아오면 isActFirst = false
         TextView start = findViewById(R.id.station_start);
         TextView destination = findViewById(R.id.station_destination);
-//        destination.bringToFront();start.bringToFront();
-//        destination.invalidate(); start.invalidate();
+//
         try {
 
             Src_static = get_intent.getStringExtra("Src");
@@ -495,14 +472,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
         // 5 * 5 분면의 InstanceBuffer 초기화
         instanceMatrix.initMat(5, 5);
-
-
-        // GPS가 꺼져있다면 On Dialog
-        createLocationRequest();
-        turn_on_GPS_dialog();
-
-
-        //Gps
         myGps = new MyGps(DetectorActivity.this, locationListener);
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
@@ -511,7 +480,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                 Log.e("thread", "run: start");
             }
         }, 0);
-
         //Compass
         compass = new Compass(this);
         sotwFormatter = new SOTWFormatter(this); // 방향 포맷,,방위각 보고 N,NW ..써주는 친구..
@@ -535,21 +503,15 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                     @Override
                     public void callback() {
                         Log.e("n", "Navigate 시작");
-
-//                    service.setReadyFlag(true);
                     }
 
                     @Override
                     public void callbackBundle(Bundle result) {
-
                     }
                 });
             }
         });
-
-
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -621,43 +583,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         frameToCropTransform.invert(cropToFrameTransform);
 
         trackingOverlay = (OverlayView) findViewById(R.id.tracking_overlay);
-        trackingOverlay.addCallback(
-                new DrawCallback() {
-                    @Override
-                    public void drawCallback(final Canvas canvas) {
-                        tracker.draw(canvas);
-                        if (isDebug()) {
-                            //tracker.drawDebug(canvas);
-                        }
-                    }
-                });
-
-        addCallback(
-                new DrawCallback() {
-                    @Override
-                    public void drawCallback(final Canvas canvas) {
-                        if (!isDebug()) {
-                            return;
-                        }
-
-                        final Vector<String> lines = new Vector<String>();
-
-//                        lines.add("");
-//                        lines.add("");
-//                        lines.add("Compass: " + sotwFormatter.format(service.getAzimuth()));
-//                        lines.add("");
-//                        lines.add("GPS");
-//                        lines.add(" Latitude: " + service.getLatitude());
-//                        lines.add(" Longitude: " + service.getLongitude());
-//                        lines.add("");
-//                        lines.add("Src Station: " + service.getSource_Station());
-//                        lines.add("Dst Station: " + service.getDest_Station());
-//                        lines.add("");
-
-                        borderedText.drawLines(canvas, 10, canvas.getHeight() - 100, lines);
-
-                    }
-                });
     }
 
     @Override
@@ -762,9 +687,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                     }
                 });
 
-
     }
-
 
     @Override
     protected int getLayoutId() {
@@ -781,10 +704,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         detector.enableStatLogging(debug);
     }
 
-    public void onFront() {
-
-
-    }
 
 //--Listener----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -908,7 +827,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
             @Override
             public void onPartialResults(Bundle bundle) {
-
             }
 
             @Override
@@ -924,18 +842,13 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
     //어디 지하철 역인지 파악하는 메소드
     public String recognizeStation(String stt_Station) {
-        String resultEng = "", targetStation = "";
-
-//        if (stt_Station.contains("역")) {
-//            targetStation = stt_Station.split("역")[0];
-//        } else
+        String targetStation = "";
         targetStation = stt_Station;
         Log.e("11", "stepppp done.");
 
         Log.e("최종결과는?", targetStation);
         return targetStation;
     }
-
 
     private int initCompletedStatus = 0;
 
@@ -945,21 +858,15 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
         final RecognitionListener sourceStationVoiceListener;
         final RecognitionListener destStationVoiceListener;
-
-        // transfer_static을 null로 초기화 -> subpage에서 돌아왔을때를 대비
-
-        // 마지막 변수 확정 리스너 -> 네, 아니요 답변에 따라, 재귀함수 시작 or navigate 함수 시작.
+                // 마지막 변수 확정 리스너 -> 네, 아니요 답변에 따라, 재귀함수 시작 or navigate 함수 시작.
         final RecognitionListener confirmVoiceListener = getRecognitionListner(new MyCallback() {
             @Override
 
             public void callback() {
-
             }
 
             @Override
             public void callbackBundle(Bundle results) {
-
-
                 String key = "";
                 key = SpeechRecognizer.RESULTS_RECOGNITION;
                 ArrayList<String> mResult = results.getStringArrayList(key);
@@ -998,35 +905,13 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                                     src_station_data = subwayapi.get_Src_XmlData(service.getSource_Station());
                                     dst_station_data = subwayapi.get_Dst_XmlData(service.getDest_Station());
 
-//                                  서버에 출발역과 도착역을 보내는 함수 ==> 후에 request_Getsubwaynum 호출을 위함.
-//                                    startPost(new SubwayData(src_station_data, dst_station_data));
                                     startPost(new SubwayData(service.getSource_Station(), service.getDest_Station()));
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-
-//                                            System.out.println("검색된 출발역이름 : " + subwayapi.getSrc_Station_name());
-//                                            System.out.println(subwayapi.getSrc_Station_name() + "의 gps_X좌표 :" + subwayapi.getSrc_gpsX2());
-//                                            System.out.println(subwayapi.getSrc_Station_name() + "의 gps_Y좌표 :" + subwayapi.getSrc_gpsY2());
-
-//                                            src_gps_x = subwayapi.getSrc_gpsX2();
-//                                            src_gps_y = subwayapi.getSrc_gpsY2();
-//                                            src_post_data = subwayapi.getSrc_Station_name();
-//                                            System.out.println("x1=" + src_gps_x);
-//                                            System.out.println("y1=" + src_gps_y);
-
-//                                            System.out.println("검색된 도착역이름 : " + subwayapi.getDst_Station_name());
-//                                            System.out.println(subwayapi.getDst_Station_name() + "의 gps_X좌표 :" + subwayapi.getDst_gpsX2());
-//                                            System.out.println(subwayapi.getDst_Station_name() + "의 gps_Y좌표 :" + subwayapi.getDst_gpsY2());
-//                                            dst_gps_x = subwayapi.getDst_gpsX2();
-//                                            dst_gps_y = subwayapi.getDst_gpsY2();
-//                                            dst_post_data = subwayapi.getDst_Station_name();
-//                                            System.out.println("x2=" + dst_gps_x);
-//                                            System.out.println("y2=" + dst_gps_y);
                                             new Thread(new Runnable() {
                                                 @Override
                                                 public void run() {
-//                                                    transfer_data = subwayapi.gettransfer(src_gps_x, src_gps_y, dst_gps_x, dst_gps_y);
 
                                                     try {
                                                         //환승정보 요청
@@ -1115,23 +1000,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                 station_start.setText(Src_station);
                 station_start.bringToFront();
 
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        src_station_data = subwayapi.get_Src_XmlData(Src_station);
-//                        runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-////                                System.out.println(src_station_data);
-//
-//                                System.out.println("검색된 역이름 : "+subwayapi.getSrc_Station_name());
-//                                System.out.println(subwayapi.getSrc_Station_name()+"의 gps_X좌표 :" +subwayapi.getSrc_gpsX());
-//                                System.out.println(subwayapi.getSrc_Station_name()+"의 gps_Y좌표 :"+subwayapi.getSrc_gpsY());
-//                            }
-//                        });
-//                    }
-//                }).start();
-
                 DetectorActivity.this.initCompletedStatus = 1;
 
                 try {
@@ -1165,7 +1033,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         voice.STT();
     }
 
-
     private Compass.CompassListener getCompassListener() {
         return new Compass.CompassListener() {
             @Override
@@ -1175,22 +1042,12 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         };
     }
 
-    Bitmap cropBitmap(Bitmap bitmap, RectF location) {
-        return Bitmap.createBitmap(bitmap, (int) location.left, (int) location.top, (int) (location.right - location.left), (int) (location.bottom - location.top));
-    }
-
-
     //    볼륨 '하'키를 누르면 서비스가 시작된다
     @Override
     public boolean onKeyDown(final int keyCode, final KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-//            || keyCode == KeyEvent.KEYCODE_BUTTON_L1 || keyCode == KeyEvent.KEYCODE_DPAD_CENTER
             this.debug = !this.debug;
-//            디버그창 띄우는 코드
-//            requestRender();
-//            onSetDebug(debug);
-            // request_getUserposition();
-            // request_Getsubwaynum();
+
             request_getTransportData();
             return true;
 
@@ -1213,55 +1070,12 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                 }
             });
 
-            //debugSangsuMapdata();
-
             return true;
         }
         return super.onKeyDown(keyCode, event);
     }
 
 
-    // GPS 꺼져있을 경우 alert dialog
-    protected void createLocationRequest() {
-        locationRequest = LocationRequest.create();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(5000);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
-
-    //  GPS 켜는 dialog 뛰우기
-    protected void turn_on_GPS_dialog() {
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addLocationRequest(locationRequest);
-
-        SettingsClient client = LocationServices.getSettingsClient(DetectorActivity.this);
-        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
-
-        //GPS get에 실패시 (GPS가 꺼져있는 경우)
-        task.addOnFailureListener(DetectorActivity.this, new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                if (e instanceof ResolvableApiException) {
-                    // Location settings are not satisfied, but this can be fixed
-                    // by showing the user a dialog.
-                    try {
-                        // Show the dialog by calling startResolutionForResult(),
-                        // and check the result in onActivityResult().
-                        ResolvableApiException resolvable = (ResolvableApiException) e;
-                        resolvable.startResolutionForResult(DetectorActivity.this,
-                                0x1);
-                    } catch (IntentSender.SendIntentException sendEx) {
-                        // Ignore the error.
-                    } finally {
-
-                        myGps.startGps(DetectorActivity.this.service);
-                        // GPS를 켜고나면 다시 재부팅하라는 안내가 있어야함
-                        // GPS를 중간에
-                    }
-                }
-            }
-        });
-    }//turn_on_gps end
 
 
     @Override
