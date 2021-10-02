@@ -16,6 +16,7 @@
 
 package org.tensorflow.demo;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -301,7 +302,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         checkBluetooth();
 
 
-
         readocr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -369,6 +369,17 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
             @Override
             public void onClick(View v) {
+                //                    camera2Fragment.takePicture();
+                post_ocr_data();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        get_ocr_data();//딜레이 후 시작할 코드 작성
+                        System.out.println("5초 딜레이");
+
+                    }
+                }, 5000);
+
 
                 if (tensorFlowYoloDetector.clone == null) {
 
@@ -386,17 +397,18 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                     String signText = "sign";
                     if (Deduplicated_labellist.contains(signText)) {
                         try {
+                            System.out.println("");
                             camera2Fragment.takePicture();
-                            post_ocr_data();
-                            new Handler().postDelayed(new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {   get_ocr_data();//딜레이 후 시작할 코드 작성
-                                    System.out.println("1초 딜레이");
-
-                                }
-                            }, 2000);
+//                            post_ocr_data();
+//                            new Handler().postDelayed(new Runnable()
+//                            {
+//                                @Override
+//                                public void run()
+//                                {   get_ocr_data();//딜레이 후 시작할 코드 작성
+//                                    System.out.println("5초 딜레이");
+//
+//                                }
+//                            }, 5000);
 
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -1255,17 +1267,13 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     @Override
     public void onStart() {
         super.onStart();
-        if (Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(DetectorActivity.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    0);
-        }
         Log.d("compass", "start compass");
         compass.start();
     }
 
     @Override
     public void onPause() {
+
         super.onPause();
         compass.stop();
     }
@@ -1288,7 +1296,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         super.onDestroy();
         voice.close();
     }
-
 
 
     //  현재 시간을 받아오는 함수
@@ -1583,8 +1590,8 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                         result += item.getTitle();
                     }
                     System.out.println("OCR 판독 결과값 : " + result);
-                    voice.TTS(result+" 문자가 인식 됨");
-                }else{
+                    voice.TTS(result + " 문자가 인식 됨");
+                } else {
                     System.out.println("문자 받아오기 실패");
                 }
             }
@@ -1595,12 +1602,15 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
             }
         });
     }
+
     private void initView() {
         mAdapter = new BeaconListAdapter();
     }
+
     private void initManager() {
         mMinewBeaconManager = mMinewBeaconManager.getInstance(this);
     }
+
     private void initListener() {
         if (mMinewBeaconManager != null) {
             BluetoothState bluetoothState = mMinewBeaconManager.checkBluetoothState();
@@ -1609,7 +1619,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                     finish();
                     break;
                 case BluetoothStatePowerOff:
-                   ;
+                    ;
                     return;
                 case BluetoothStatePowerOn:
                     break;
@@ -1713,23 +1723,21 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                                 String past = "";
                                 String current = "";
 
-                                for(String value : BeaconName_clone){
+                                for (String value : BeaconName_clone) {
                                     past += value;
                                 }
                                 System.out.println("past = " + past);
-                                for(String value : nBeacon){
+                                for (String value : nBeacon) {
                                     current += value;
                                 }
 
                                 System.out.println("current = " + current);
                                 if (past.equals(current)) {
                                     System.out.println("비콘 변화 X");
-                                }
-                                else if(current.isEmpty() == true){
-                                    voice.TTS("주변에 " + past +  "가 있습니다");
-                                }
-                                else {
-                                    voice.TTS("주변에 " + current +"가 있습니다");
+                                } else if (current.isEmpty() == true) {
+                                    voice.TTS("주변에 " + past + "가 있습니다");
+                                } else {
+                                    voice.TTS("주변에 " + current + "가 있습니다");
                                 }
 
 
@@ -1759,6 +1767,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
             }
         });
     }
+
     public void checkBluetooth() {
         BluetoothState bluetoothState = mMinewBeaconManager.checkBluetoothState();
         switch (bluetoothState) {
