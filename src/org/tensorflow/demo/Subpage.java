@@ -71,7 +71,6 @@ public class Subpage extends Activity {
     private List<MinewBeacon> mMinewBeacons = new ArrayList<>();
 
 
-
     public static String getUserPosition_info() {
         return userPosition_info;
     }
@@ -90,7 +89,7 @@ public class Subpage extends Activity {
         setContentView(R.layout.activity_camera3);
         Button back = findViewById(R.id.backto_navi);
         Button readinfo = findViewById(R.id.readinfo);
-        Button btn_userpositon =findViewById(R.id.get_userposition);
+        Button btn_userpositon = findViewById(R.id.get_userposition);
         TextView tv1 = findViewById(R.id.station_start);
         Button emCall = findViewById(R.id.emergency_call);
         TextView tv2 = findViewById(R.id.station_destination);
@@ -110,10 +109,9 @@ public class Subpage extends Activity {
         arrival = get_intent.getStringExtra("arrivalinfo");
 
         //비콘세팅
-        try{
+        try {
             mMinewBeaconManager.startScan();
-        }
-        catch(NullPointerException e) {
+        } catch (NullPointerException e) {
             voice.TTS("블루투스를 켜주세요");
             System.out.println("블루투스를 켜주세요");
             e.printStackTrace();
@@ -130,16 +128,16 @@ public class Subpage extends Activity {
             @Override
             public void onClick(View v) {
                 try {
-                    voice.TTS("환승정보"+transfer_info +"열차도착정보"+arrival + "실시간열차정보"+userPosition_info);
+                    voice.TTS("환승정보" + transfer_info + "열차도착정보" + arrival + "실시간열차정보" + userPosition_info);
                     if (transfer_info.isEmpty() == true && arrival.isEmpty() == true) {
                         voice.TTS("현재정보가 없습니다. 경로설정이나 열차를 조회하십시오");
                     }
-                    voice.TTS(arrival);
+//                   voice.TTS(arrival);
                     if (transfer_info.isEmpty() == true) {
                         voice.TTS("환승정보 없음");
                     } else if (arrival.isEmpty() == true) {
                         voice.TTS("열차정보 없음");
-                    } else if(userPosition_info.isEmpty()==true){
+                    } else if (userPosition_info.isEmpty() == true) {
                         voice.TTS("실시간 도착 정보없음");
 //                        voice.TTS("현재 정보 읽기 오류");
                     }
@@ -161,13 +159,17 @@ public class Subpage extends Activity {
             setResult(Activity.RESULT_OK, get_intent);
             if (Src_station == null) {
                 tv1.setText("출발역 : 정보없음");
-            } if (Dst_station == null) {
+            }
+            if (Dst_station == null) {
                 tv2.setText("도착역 : 정보없음");
-            } if (transfer_info.isEmpty() == true) {
+            }
+            if (transfer_info.isEmpty() == true) {
                 tv3.setText("환승역 : 정보없음");
-            } if (arrival.isEmpty() == true) {
+            }
+            if (arrival.isEmpty() == true) {
                 tv4.setText("열차도착 : 정보없음");
-            } if (userPosition_info.isEmpty() == true) {
+            }
+            if (userPosition_info.isEmpty() == true) {
                 tv5.setText("실시간 열차정보 : 없음");
             }
         } catch (Exception e) {
@@ -294,7 +296,7 @@ public class Subpage extends Activity {
     ArrayList<String> usersta_clone = new ArrayList<>();
 
     public void request_getUserposition() {
-       final Subpage subpage =new Subpage();
+        final Subpage subpage = new Subpage();
         Call<List<UserpositonData>> getCall = serviceApi.get_userposition();
         getCall.enqueue(new Callback<List<UserpositonData>>() {
             @Override
@@ -319,7 +321,7 @@ public class Subpage extends Activity {
                     String userposition_info = "";
                     for (int i = 0; i < size; i++) {
                         userposition_info += "열차 번호 : " + usertrain_clone.get(i) + "\n"
-                                + "현재 위치는 [ " + usersta_clone.get(i)+" ] 입니다.";
+                                + "현재 위치는 [ " + usersta_clone.get(i) + " ] 입니다.";
 //
                     }
                     System.out.println(userposition_info);
@@ -336,6 +338,7 @@ public class Subpage extends Activity {
         });
 
     }
+
     public void checkBluetooth() {
         BluetoothState bluetoothState = mMinewBeaconManager.checkBluetoothState();
         switch (bluetoothState) {
@@ -349,8 +352,9 @@ public class Subpage extends Activity {
                 break;
         }
     }
+
     private void initView() {
-        
+
         mAdapter = new BeaconListAdapter();
     }
 
@@ -417,11 +421,11 @@ public class Subpage extends Activity {
 //                          d=Math.round(d*100)/100;
 //
                             if (minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue().contains("FDA50693") == true) {
-                                BeaconName.add("화장실");
+                                BeaconName.add("5번출구 입니다");
                             } else if (minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue().contains("AB8190D5") == true) {
-                                BeaconName.add("엘레베이터");
+                                BeaconName.add("7번 출구입니다");
                             } else if (minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue().contains("74278BDA") == true) {
-                                BeaconName.add("개찰구");
+                                BeaconName.add("엘레베이터");
                             }
 
                             values.add(d);
@@ -442,32 +446,35 @@ public class Subpage extends Activity {
                                 uuuid.clear();
                                 BeaconName.clear();
 
-                                Collections.sort(BeaconName_clone);
-
-                                String past = "";
-                                String current = "";
-
-                                for(String value : BeaconName_clone){
-                                    past += value;
-                                }
-                                System.out.println("past = " + past);
-                                for(String value : nBeacon){
-                                    current += value;
-                                }
-
-                                System.out.println("current = " + current);
-                                if (past.equals(current)) {
-                                    System.out.println("비콘 변화 X");
-                                }
-                                else if(current.isEmpty() == true){
-                                    voice.TTS("주변에 " + past +  "가 있습니다");
-                                }
-                                else {
-                                    voice.TTS("주변에 " + current +"가 있습니다");
-                                }
+                                if (d <= 10.0) {
 
 
-                                nBeacon = (ArrayList<String>) BeaconName_clone.clone();
+                                    Collections.sort(BeaconName_clone);
+
+                                    String past = "";
+                                    String current = "";
+
+                                    for (String value : BeaconName_clone) {
+                                        past += value;
+                                    }
+                                    System.out.println("past = " + past);
+                                    for (String value : nBeacon) {
+                                        current += value;
+                                    }
+
+                                    System.out.println("current = " + current);
+                                    if (past.equals(current)) {
+                                        System.out.println("비콘 변화 X");
+                                    } else if (current.isEmpty() == true) {
+                                        voice.TTS("주변에 " + past + "가 있습니다");
+                                    } else {
+                                        voice.TTS("주변에 " + current + "가 있습니다");
+                                    }
+
+
+                                    nBeacon = (ArrayList<String>) BeaconName_clone.clone();
+
+                                }
                             }
                         }
                     }
@@ -488,6 +495,7 @@ public class Subpage extends Activity {
             }
         });
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
