@@ -421,9 +421,9 @@ public class Subpage extends Activity {
 //                          d=Math.round(d*100)/100;
 //
                             if (minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue().contains("FDA50693") == true) {
-                                BeaconName.add("5번출구 입니다");
+                                BeaconName.add("5번출구");
                             } else if (minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue().contains("AB8190D5") == true) {
-                                BeaconName.add("7번 출구입니다");
+                                BeaconName.add("7번 출구");
                             } else if (minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue().contains("74278BDA") == true) {
                                 BeaconName.add("엘레베이터");
                             }
