@@ -70,7 +70,7 @@ public abstract class CameraActivity extends Activity
     private static final String PERMISSION_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
     private static final String PERMISSION_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String PERMISSION_RECORD_AUDIO = Manifest.permission.RECORD_AUDIO;
-
+    private static final String PERMISSION_CALL_PHONE = Manifest.permission.CALL_PHONE;
     protected boolean debug = false;
 
     private Handler handler;
@@ -355,6 +355,8 @@ public abstract class CameraActivity extends Activity
                             && checkSelfPermission(PERMISSION_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                             checkSelfPermission(PERMISSION_CAMERA) == PackageManager.PERMISSION_GRANTED
                             && checkSelfPermission(PERMISSION_STORAGE) == PackageManager.PERMISSION_GRANTED
+                            && checkSelfPermission(PERMISSION_CALL_PHONE) == PackageManager.PERMISSION_GRANTED
+
                     ;
         } else {
             return true;
@@ -364,11 +366,13 @@ public abstract class CameraActivity extends Activity
     private void requestPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (shouldShowRequestPermissionRationale(PERMISSION_CAMERA) ||
-                    shouldShowRequestPermissionRationale(PERMISSION_STORAGE) || shouldShowRequestPermissionRationale(PERMISSION_LOCATION) || shouldShowRequestPermissionRationale(PERMISSION_RECORD_AUDIO)) {
+                    shouldShowRequestPermissionRationale(PERMISSION_STORAGE) || shouldShowRequestPermissionRationale(PERMISSION_LOCATION) || shouldShowRequestPermissionRationale(PERMISSION_RECORD_AUDIO)
+                    || shouldShowRequestPermissionRationale(PERMISSION_CALL_PHONE)
+            ) {
 //                Toast.makeText(CameraActivity.this,
 //                        "Camera AND storage permission are required for this demo", Toast.LENGTH_LONG).show();
             }
-            requestPermissions(new String[]{PERMISSION_CAMERA, PERMISSION_STORAGE, PERMISSION_LOCATION, PERMISSION_RECORD_AUDIO}, PERMISSIONS_REQUEST);
+            requestPermissions(new String[]{PERMISSION_CAMERA, PERMISSION_STORAGE, PERMISSION_LOCATION, PERMISSION_RECORD_AUDIO, PERMISSION_CALL_PHONE}, PERMISSIONS_REQUEST);
         }
     }
 

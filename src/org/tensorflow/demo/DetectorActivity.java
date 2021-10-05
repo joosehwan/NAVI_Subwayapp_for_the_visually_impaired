@@ -19,6 +19,7 @@ package org.tensorflow.demo;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -350,15 +351,15 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
             @Override
             public void onClick(View v) {
                 //                    camera2Fragment.takePicture();
-                post_ocr_data();
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        get_ocr_data();//딜레이 후 시작할 코드 작성
-                        System.out.println("5초 딜레이");
-
-                    }
-                }, 5000);
+//                post_ocr_data();
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        get_ocr_data();//딜레이 후 시작할 코드 작성
+//                        System.out.println("5초 딜레이");
+//
+//                    }
+//                }, 5000);
 
                 if (tensorFlowYoloDetector.clone == null) {
 
@@ -378,16 +379,16 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                         try {
                             System.out.println("");
                             camera2Fragment.takePicture();
-//                            post_ocr_data();
-//                            new Handler().postDelayed(new Runnable()
-//                            {
-//                                @Override
-//                                public void run()
-//                                {   get_ocr_data();//딜레이 후 시작할 코드 작성
-//                                    System.out.println("5초 딜레이");
-//
-//                                }
-//                            }, 5000);
+                            post_ocr_data();
+                            new Handler().postDelayed(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {   get_ocr_data();//딜레이 후 시작할 코드 작성
+                                    System.out.println("5초 딜레이");
+
+                                }
+                            }, 5000);
 
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -513,14 +514,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case REQUEST_ENABLE_BT:
-                break;
-        }
-    }
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -1401,10 +1395,18 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                 if (response.isSuccessful()) {
                     List<Ocrdata> ocrdata = response.body();
                     for (Ocrdata item : ocrdata) {
-                        result += item.getTitle();
+
+                        result += "/"+ item.getTitle();
+
+
                     }
+
+                    String str =result.substring(result.lastIndexOf("/"),result.length());
+
+                   System.out.println("str : "+ str);
                     System.out.println("OCR 판독 결과값 : " + result);
-                    voice.TTS(result + " 문자가 인식 됨");
+                    voice.TTS(str + " 문자가 인식 됨");
+                    Toast.makeText(getApplicationContext(),"이정표 : "+result,Toast.LENGTH_LONG);
                 } else {
                     System.out.println("문자 받아오기 실패");
                 }
@@ -1417,7 +1419,22 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         });
     }
 
+    public void checkBluetooth() {
+        BluetoothState bluetoothState = mMinewBeaconManager.checkBluetoothState();
+        switch (bluetoothState) {
+            case BluetoothStateNotSupported:
+                finish();
+                break;
+            case BluetoothStatePowerOff:
+                showBLEDialog();
+                break;
+            case BluetoothStatePowerOn:
+                break;
+        }
+    }
+
     private void initView() {
+
         mAdapter = new BeaconListAdapter();
     }
 
@@ -1425,7 +1442,8 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         mMinewBeaconManager = mMinewBeaconManager.getInstance(this);
     }
 
-    private void initListener() {
+    public void initListener() {
+
         if (mMinewBeaconManager != null) {
             BluetoothState bluetoothState = mMinewBeaconManager.checkBluetoothState();
             switch (bluetoothState) {
@@ -1433,7 +1451,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                     finish();
                     break;
                 case BluetoothStatePowerOff:
-                    ;
+                    showBLEDialog();
                     return;
                 case BluetoothStatePowerOn:
                     break;
@@ -1444,45 +1462,23 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        //2번째 들어갔을때 둘다 기존
 
         mMinewBeaconManager.setDeviceManagerDelegateListener(new MinewBeaconManagerListener() {
-            /**
-             *   if the manager find some new beacon, it will call back this method.
-             *
-             *  @param minewBeacons  new beacons the manager scanned
-             */
+
             @Override
             public void onAppearBeacons(List<MinewBeacon> minewBeacons) {
-                for (MinewBeacon minewBeacon : minewBeacons) {
-                    String deviceName = minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue();
-//                            Toast.makeText(getApplicationContext(), deviceName + "  on range", Toast.LENGTH_SHORT).show();
-
-                    System.out.println("on appear name : " + minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_Name).getStringValue());
-                    System.out.println("on appear name : " + minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue());
-                }
+//
             }
 
-            /**
-             *  if a beacon didn't update data in 10 seconds, we think this beacon is out of rang, the manager will call back this method.
-             *
-             *  @param minewBeacons beacons out of range
-             */
             @Override
             public void onDisappearBeacons(List<MinewBeacon> minewBeacons) {
-                /*for (MinewBeacon minewBeacon : minewBeacons) {
-                    String deviceName = minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_Name).getStringValue();
-                    Toast.makeText(getApplicationContext(), deviceName + "  out range", Toast.LENGTH_SHORT).show();
-                }*/
+                //
             }
 
-            /**
-             *  the manager calls back this method every 1 seconds, you can get all scanned beacons.
-             *
-             *  @param minewBeacons all scanned beacons
-             */
             @Override
             public void onRangeBeacons(final List<MinewBeacon> minewBeacons) {
+
                 final ArrayList<String> stacompare = new ArrayList<String>();
                 stacompare.add("74278BDA-B644-4520-8F0C-720EAF059935");
                 stacompare.add("AB8190D5-D11E-4941-ACC4-42F30510B408");
@@ -1537,21 +1533,23 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                                 String past = "";
                                 String current = "";
 
-                                for (String value : BeaconName_clone) {
+                                for(String value : BeaconName_clone){
                                     past += value;
                                 }
                                 System.out.println("past = " + past);
-                                for (String value : nBeacon) {
+                                for(String value : nBeacon){
                                     current += value;
                                 }
 
                                 System.out.println("current = " + current);
                                 if (past.equals(current)) {
                                     System.out.println("비콘 변화 X");
-                                } else if (current.isEmpty() == true) {
-                                    voice.TTS("주변에 " + past + "가 있습니다");
-                                } else {
-                                    voice.TTS("주변에 " + current + "가 있습니다");
+                                }
+                                else if(current.isEmpty() == true){
+                                    voice.TTS("주변에 " + past +  "가 있습니다");
+                                }
+                                else {
+                                    voice.TTS("주변에 " + current +"가 있습니다");
                                 }
 
 
@@ -1561,16 +1559,13 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                     }
                 });
 
+
             }
 
-            /**
-             *  the manager calls back this method when BluetoothStateChanged.
-             *
-             *  @param state BluetoothState
-             */
             @Override
-            public void onUpdateState(BluetoothState state) {
-                switch (state) {
+            public void onUpdateState(BluetoothState bluetoothState) {
+                bluetoothState = mMinewBeaconManager.checkBluetoothState();
+                switch (bluetoothState) {
                     case BluetoothStatePowerOn:
                         Toast.makeText(getApplicationContext(), "BluetoothStatePowerOn", Toast.LENGTH_SHORT).show();
                         break;
@@ -1582,20 +1577,19 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         });
     }
 
-    public void checkBluetooth() {
-        BluetoothState bluetoothState = mMinewBeaconManager.checkBluetoothState();
-        switch (bluetoothState) {
-            case BluetoothStateNotSupported:
-                finish();
-                break;
-            case BluetoothStatePowerOff:
-
-                break;
-            case BluetoothStatePowerOn:
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_ENABLE_BT:
                 break;
         }
     }
 
+    private void showBLEDialog() {
+        Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+    }
 
 }
 

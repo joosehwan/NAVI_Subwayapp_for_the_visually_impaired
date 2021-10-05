@@ -3,6 +3,7 @@ package org.tensorflow.demo;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -335,14 +336,29 @@ public class Subpage extends Activity {
         });
 
     }
-
+    public void checkBluetooth() {
+        BluetoothState bluetoothState = mMinewBeaconManager.checkBluetoothState();
+        switch (bluetoothState) {
+            case BluetoothStateNotSupported:
+                finish();
+                break;
+            case BluetoothStatePowerOff:
+                showBLEDialog();
+                break;
+            case BluetoothStatePowerOn:
+                break;
+        }
+    }
     private void initView() {
+        
         mAdapter = new BeaconListAdapter();
     }
+
     private void initManager() {
-        mMinewBeaconManager = mMinewBeaconManager.getInstance(this);
+        mMinewBeaconManager = MinewBeaconManager.getInstance(this);
     }
-    private void initListener() {
+
+    public void initListener() {
         if (mMinewBeaconManager != null) {
             BluetoothState bluetoothState = mMinewBeaconManager.checkBluetoothState();
             switch (bluetoothState) {
@@ -350,56 +366,33 @@ public class Subpage extends Activity {
                     finish();
                     break;
                 case BluetoothStatePowerOff:
-                    ;
+                    showBLEDialog();
                     return;
                 case BluetoothStatePowerOn:
                     break;
             }
         }
+
         try {
             mMinewBeaconManager.startScan();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
         mMinewBeaconManager.setDeviceManagerDelegateListener(new MinewBeaconManagerListener() {
-            /**
-             *   if the manager find some new beacon, it will call back this method.
-             *
-             *  @param minewBeacons  new beacons the manager scanned
-             */
+
             @Override
             public void onAppearBeacons(List<MinewBeacon> minewBeacons) {
-                for (MinewBeacon minewBeacon : minewBeacons) {
-                    String deviceName = minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue();
-//                            Toast.makeText(getApplicationContext(), deviceName + "  on range", Toast.LENGTH_SHORT).show();
-
-                    System.out.println("on appear name : " + minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_Name).getStringValue());
-                    System.out.println("on appear name : " + minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue());
-                }
+//
             }
 
-            /**
-             *  if a beacon didn't update data in 10 seconds, we think this beacon is out of rang, the manager will call back this method.
-             *
-             *  @param minewBeacons beacons out of range
-             */
             @Override
             public void onDisappearBeacons(List<MinewBeacon> minewBeacons) {
-                /*for (MinewBeacon minewBeacon : minewBeacons) {
-                    String deviceName = minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_Name).getStringValue();
-                    Toast.makeText(getApplicationContext(), deviceName + "  out range", Toast.LENGTH_SHORT).show();
-                }*/
+                //
             }
 
-            /**
-             *  the manager calls back this method every 1 seconds, you can get all scanned beacons.
-             *
-             *  @param minewBeacons all scanned beacons
-             */
             @Override
             public void onRangeBeacons(final List<MinewBeacon> minewBeacons) {
+
                 final ArrayList<String> stacompare = new ArrayList<String>();
                 stacompare.add("74278BDA-B644-4520-8F0C-720EAF059935");
                 stacompare.add("AB8190D5-D11E-4941-ACC4-42F30510B408");
@@ -417,8 +410,8 @@ public class Subpage extends Activity {
                         for (MinewBeacon minewBeacon : minewBeacons) {
                             String deviceName = minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue();
 //                            Toast.makeText(getApplicationContext(), deviceName + "  on range", Toast.LENGTH_SHORT).show();
-//                            System.out.println("on range UUID : " + minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue());
-//                            System.out.println("on range RSSI : " + minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_RSSI).getStringValue());
+                            System.out.println("on range UUID : " + minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue());
+                            System.out.println("on range RSSI : " + minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_RSSI).getStringValue());
                             double d = ((-50 - (double) minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_RSSI).getIntValue()) / 20.0);
                             d = Math.pow(10.0, d);
 //                          d=Math.round(d*100)/100;
@@ -432,7 +425,7 @@ public class Subpage extends Activity {
                             }
 
                             values.add(d);
-// 기존의 비콘 = BeaconName_clone new 비콘 = nBeacon
+
                             System.out.println("d의값=" + d);
                             System.out.println(mAdapter.getItemCount());
                             if (stacompare.contains(minewBeacon.getBeaconValue(BeaconValueIndex.MinewBeaconValueIndex_UUID).getStringValue()) == true) {
@@ -479,17 +472,12 @@ public class Subpage extends Activity {
                         }
                     }
                 });
-
             }
 
-            /**
-             *  the manager calls back this method when BluetoothStateChanged.
-             *
-             *  @param state BluetoothState
-             */
             @Override
-            public void onUpdateState(BluetoothState state) {
-                switch (state) {
+            public void onUpdateState(BluetoothState bluetoothState) {
+                bluetoothState = mMinewBeaconManager.checkBluetoothState();
+                switch (bluetoothState) {
                     case BluetoothStatePowerOn:
                         Toast.makeText(getApplicationContext(), "BluetoothStatePowerOn", Toast.LENGTH_SHORT).show();
                         break;
@@ -500,17 +488,17 @@ public class Subpage extends Activity {
             }
         });
     }
-    public void checkBluetooth() {
-        BluetoothState bluetoothState = mMinewBeaconManager.checkBluetoothState();
-        switch (bluetoothState) {
-            case BluetoothStateNotSupported:
-                finish();
-                break;
-            case BluetoothStatePowerOff:
-
-                break;
-            case BluetoothStatePowerOn:
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_ENABLE_BT:
                 break;
         }
+    }
+
+    private void showBLEDialog() {
+        Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+        startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
     }
 }
