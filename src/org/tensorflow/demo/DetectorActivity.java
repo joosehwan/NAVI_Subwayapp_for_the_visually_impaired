@@ -16,13 +16,9 @@
 
 package org.tensorflow.demo;
 
-import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
-import android.content.IntentSender;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
@@ -53,27 +49,14 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
 import com.minew.beacon.BeaconValueIndex;
 import com.minew.beacon.BluetoothState;
@@ -83,7 +66,6 @@ import com.minew.beacon.MinewBeaconManagerListener;
 
 import org.tensorflow.demo.OverlayView.DrawCallback;
 import org.tensorflow.demo.blescan.BeaconListAdapter;
-import org.tensorflow.demo.blescan.MainActivity;
 import org.tensorflow.demo.blescan.UserRssi;
 import org.tensorflow.demo.data.OcrResponse;
 import org.tensorflow.demo.data.Ocrdata;
@@ -94,7 +76,6 @@ import org.tensorflow.demo.data.TrainNum;
 import org.tensorflow.demo.data.TransportData;
 import org.tensorflow.demo.env.BorderedText;
 import org.tensorflow.demo.env.ImageUtils;
-import org.tensorflow.demo.env.Logger;
 import org.tensorflow.demo.network.RetrofitClient;
 import org.tensorflow.demo.network.ServiceApi;
 import org.tensorflow.demo.tracking.MultiBoxTracker;
@@ -108,8 +89,6 @@ import org.tensorflow.demo.vision_module.Voice;
 import org.tensorflow.demo.vision_module.senario;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -117,7 +96,6 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
-import java.util.Vector;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -132,10 +110,7 @@ import retrofit2.Response;
  * objects.
  */
 @RequiresApi(api = Build.VERSION_CODES.N)
-public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraActivity implements OnImageAvailableListener {
-
-
-    private static final Logger LOGGER = new Logger();
+public class DetectorActivity extends CameraActivity implements OnImageAvailableListener {
 
     // Configuration values for tiny-yolo-voc. Note that the graph is not included with TensorFlow and
     // must be manually placed in the assets/ directory by the user.
@@ -151,7 +126,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     private static final int YOLO_BLOCK_SIZE = 32;
 
     private enum DetectorMode {
-        YOLO;
+        YOLO
     }
 
     private static final DetectorMode MODE = DetectorMode.YOLO;
@@ -163,17 +138,11 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     private static final float TEXT_SIZE_DIP = 10;
     private Integer sensorOrientation;
     private Classifier detector;
-    private long lastProcessingTimeMs;
-    private long lastProcessingTimeMs1;
-    private long lastDetectStartTime = 0;
     private Bitmap rgbFrameBitmap = null;
     private Bitmap croppedBitmap = null;
     private Bitmap cropCopyBitmap = null;
-    private Bitmap cropSignBitmap = null;
     private float bitmapWidth = 0;
     private float bitmapHeight = 0;
-    private int N = 5; // N * N 사분면
-    private static final int BUFFERTIME = 3;
     private boolean computingDetection = false;
     private long timestamp = 0;
     private Matrix frameToCropTransform;
@@ -190,14 +159,11 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     private Voice voice;
     private Compass compass;
     private SOTWFormatter sotwFormatter;
-    private Sector curSector = new Sector(false);
-    private boolean dotFlag = false;
     private boolean yoloFirstStartFlag = false;
     public InstanceMatrix instanceMatrix = new InstanceMatrix();
     TensorFlowYoloDetector tensorFlowYoloDetector = new TensorFlowYoloDetector();
 
     //각종 변수--------------------------------------------------------------------------------------
-
 
     //메인페이지 상단에 뜨는 출발역 도착역 변수
     public static String Src_station;
@@ -350,16 +316,22 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
             @Override
             public void onClick(View v) {
-                //                    camera2Fragment.takePicture();
-//                post_ocr_data();
-//                new Handler().postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        get_ocr_data();//딜레이 후 시작할 코드 작성
-//                        System.out.println("5초 딜레이");
-//
-//                    }
-//                }, 5000);
+                try {
+                    camera2Fragment.takePicture();
+                    post_ocr_data();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            get_ocr_data();//딜레이 후 시작할 코드 작성
+                            System.out.println("5초 딜레이");
+
+                        }
+                    }, 7000);
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
 
                 if (tensorFlowYoloDetector.clone == null) {
 
@@ -376,23 +348,23 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
                     String signText = "sign";
                     if (Deduplicated_labellist.contains(signText)) {
-                        try {
-                            System.out.println("");
-                            camera2Fragment.takePicture();
-                            post_ocr_data();
-                            new Handler().postDelayed(new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {   get_ocr_data();//딜레이 후 시작할 코드 작성
-                                    System.out.println("5초 딜레이");
+//                        try {
+//                            System.out.println("");
+//                            camera2Fragment.takePicture();
+//                            post_ocr_data();
+//                            new Handler().postDelayed(new Runnable()
+//                            {
+//                                @Override
+//                                public void run()
+//                                {   get_ocr_data();//딜레이 후 시작할 코드 작성
+//                                    System.out.println("5초 딜레이");
+//
+//                                }
+//                            }, 5000);
 
-                                }
-                            }, 5000);
-
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
                     }
                 }
                 String front = "";
@@ -514,8 +486,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         });
     }
 
-
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         // 터치 up이 되었을 때 화면을 갱신한다.
@@ -577,6 +547,16 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         frameToCropTransform.invert(cropToFrameTransform);
 
         trackingOverlay = (OverlayView) findViewById(R.id.tracking_overlay);
+        trackingOverlay.addCallback(
+                new DrawCallback() {
+                    @Override
+                    public void drawCallback(final Canvas canvas) {
+                        tracker.draw(canvas);
+                        if (isDebug()) {
+                            //tracker.drawDebug(canvas);
+                        }
+                    }
+                });
     }
 
     @Override
@@ -621,8 +601,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                     @TargetApi(Build.VERSION_CODES.N)
                     @Override
                     public void run() {
-
-
                         if (!DetectorActivity.this.yoloFirstStartFlag) {
                             DetectorActivity.this.yoloFirstStartFlag = true;
                             voice.TTS("로딩완료");
@@ -631,12 +609,14 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                         final long startTime = SystemClock.uptimeMillis();
 
                         final List<Classifier.Recognition> results = detector.recognizeImage(croppedBitmap);
-                        DetectorActivity.this.lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
+
                         if (bitmapHeight == 0 || bitmapWidth == 0) {
                             DetectorActivity.this.bitmapHeight = croppedBitmap.getHeight();
                             DetectorActivity.this.bitmapWidth = croppedBitmap.getWidth();
 //                            Log.e("bitmapSize", "width: " + bitmapWidth);
 //                            Log.e("bitmapSize", "height: " + bitmapWidth);
+//                          instanceTimeBuffer.setBitmapHeight(DetectorActivity.this.bitmapHeight);
+//                          instanceTimeBuffer.setBitmapWidth(DetectorActivity.this.bitmapWidth);
                         }
                         // Canvas On/Off 기능 생각해보기
                         cropCopyBitmap = Bitmap.createBitmap(croppedBitmap);
@@ -651,16 +631,11 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                         final List<Classifier.Recognition> mappedRecognitions =
                                 new LinkedList<Classifier.Recognition>();
 
-
 // 이코드가 없으면 화면에 네모박스 안생김
                         for (final Classifier.Recognition resultb : results) {
-                            // dot block이 존재한다면 check
-                            Classifier.Recognition result = resultb.clone();
-                            if (result.getIdx() == 0) dotFlag = true;
-                            curSector.setCurSector(result.getIdx());
-                            final RectF location = result.getLocation();
 
-                            instanceMatrix.putRecog(result);
+                            Classifier.Recognition result = resultb.clone();
+                            final RectF location = result.getLocation();
 
                             if (location != null && result.getConfidence() >= minimumConfidence) {
                                 canvas.drawRect(location, paint);
@@ -670,8 +645,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                                 mappedRecognitions.add(result);
                             }
                         }
-                        DetectorActivity.this.lastProcessingTimeMs1 += SystemClock.uptimeMillis() - startTime;
-
+//                        DetectorActivity.this.lastProcessingTimeMs1 += SystemClock.uptimeMillis() - startTime;
 
                         tracker.trackResults(mappedRecognitions, luminanceCopy, currTimestamp);
                         trackingOverlay.postInvalidate();
@@ -852,7 +826,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
 
         final RecognitionListener sourceStationVoiceListener;
         final RecognitionListener destStationVoiceListener;
-                // 마지막 변수 확정 리스너 -> 네, 아니요 답변에 따라, 재귀함수 시작 or navigate 함수 시작.
+        // 마지막 변수 확정 리스너 -> 네, 아니요 답변에 따라, 재귀함수 시작 or navigate 함수 시작.
         final RecognitionListener confirmVoiceListener = getRecognitionListner(new MyCallback() {
             @Override
 
@@ -1068,8 +1042,6 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         }
         return super.onKeyDown(keyCode, event);
     }
-
-
 
 
     @Override
@@ -1387,7 +1359,8 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
     //OCR의 결과를 Get 하는 함수
 
     public void get_ocr_data() {
-        Call<List<Ocrdata>> getCall = serviceApi.get_ocr_data();
+        final TextView ocrtext = findViewById(R.id.cameraOCR);
+        final Call<List<Ocrdata>> getCall = serviceApi.get_ocr_data();
         getCall.enqueue(new Callback<List<Ocrdata>>() {
             @Override
             public void onResponse(Call<List<Ocrdata>> call, Response<List<Ocrdata>> response) {
@@ -1396,21 +1369,26 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                     List<Ocrdata> ocrdata = response.body();
                     for (Ocrdata item : ocrdata) {
 
-                        result += "/"+ item.getTitle();
-
-
+                        result += "/" + item.getTitle();
                     }
 
-                    String str =result.substring(result.lastIndexOf("/"),result.length());
+                    String str = result.substring(result.lastIndexOf("/"), result.length());
+                    if (str != "null") {
+                        System.out.println("str : " + str);
+                        System.out.println("OCR 판독 결과값 : " + result);
+                        voice.TTS(str + " 문자가 인식 됨");
+                        ocrtext.setText("문자인식 : "+ str);
+                        Toast.makeText(getApplicationContext(), "이정표 : " + result, Toast.LENGTH_LONG);
+                    } else if (str == "/null") {
+                        voice.TTS("문자가 인식 되지 않음.");
+//                        get_ocr_data();
+                    }
 
-                   System.out.println("str : "+ str);
-                    System.out.println("OCR 판독 결과값 : " + result);
-                    voice.TTS(str + " 문자가 인식 됨");
-                    Toast.makeText(getApplicationContext(),"이정표 : "+result,Toast.LENGTH_LONG);
                 } else {
                     System.out.println("문자 받아오기 실패");
                 }
             }
+
 
             @Override
             public void onFailure(Call<List<Ocrdata>> call, Throwable throwable) {
@@ -1533,23 +1511,21 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
                                 String past = "";
                                 String current = "";
 
-                                for(String value : BeaconName_clone){
+                                for (String value : BeaconName_clone) {
                                     past += value;
                                 }
                                 System.out.println("past = " + past);
-                                for(String value : nBeacon){
+                                for (String value : nBeacon) {
                                     current += value;
                                 }
 
                                 System.out.println("current = " + current);
                                 if (past.equals(current)) {
                                     System.out.println("비콘 변화 X");
-                                }
-                                else if(current.isEmpty() == true){
-                                    voice.TTS("주변에 " + past +  "가 있습니다");
-                                }
-                                else {
-                                    voice.TTS("주변에 " + current +"가 있습니다");
+                                } else if (current.isEmpty() == true) {
+                                    voice.TTS("주변에 " + past + "가 있습니다");
+                                } else {
+                                    voice.TTS("주변에 " + current + "가 있습니다");
                                 }
 
 
@@ -1590,6 +1566,7 @@ public class DetectorActivity<Resultlabel, RecyclerViewAdapter> extends CameraAc
         Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
     }
+
 
 }
 
