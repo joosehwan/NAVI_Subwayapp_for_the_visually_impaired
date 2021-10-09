@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Telephony;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -122,26 +123,29 @@ public class Subpage extends Activity {
         checkBluetooth();
         initListener();
 
-        Toast.makeText(this, transfer_info, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, transfer_info, Toast.LENGTH_SHORT).show();
 
         readinfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    voice.TTS("환승정보" + transfer_info + "열차도착정보" + arrival + "실시간열차정보" + userPosition_info);
-                    if (transfer_info.isEmpty() == true && arrival.isEmpty() == true) {
-                        voice.TTS("현재정보가 없습니다. 경로설정이나 열차를 조회하십시오");
-                    }
-//                   voice.TTS(arrival);
-                    if (transfer_info.isEmpty() == true) {
-                        voice.TTS("환승정보 없음");
-                    } else if (arrival.isEmpty() == true) {
-                        voice.TTS("열차정보 없음");
-                    } else if (userPosition_info.isEmpty() == true) {
-                        voice.TTS("실시간 도착 정보없음");
-//                        voice.TTS("현재 정보 읽기 오류");
-                    }
+                String tr_Info = "", arr_Info="", up_Info="";
 
+                try {
+                    tr_Info = transfer_info;
+                    arr_Info = arrival;
+                    up_Info=userPosition_info  ;
+                    if (transfer_info.isEmpty() == true && arrival.isEmpty() == true && userPosition_info.isEmpty() == true) {
+                        voice.TTS("현재정보가 없습니다. 경로설정이나 열차를 조회하십시오");
+                    } else {
+                        if(tr_Info.isEmpty()){
+                            tr_Info=" 없음. \n";
+                        }if(arr_Info.isEmpty()){
+                            arr_Info= " 없음. \n";
+                        }if(up_Info.isEmpty()){
+                            up_Info= " 없음. \n";
+                        }
+                        voice.TTS("환승정보.\n" + tr_Info + "열차도착정보.\n" + arr_Info + "실시간열차정보.\n" + up_Info);
+                    }
 
                 } catch (NullPointerException e) {
                     e.getMessage();
@@ -254,7 +258,7 @@ public class Subpage extends Activity {
             @Override
             public void onClick(View v) {
                 request_getUserposition();
-                tv5.setText(userPosition_info);
+//                tv5.setText(userPosition_info);
             }
         });
 
@@ -296,7 +300,7 @@ public class Subpage extends Activity {
     ArrayList<String> usersta_clone = new ArrayList<>();
 
     public void request_getUserposition() {
-        final Subpage subpage = new Subpage();
+        final TextView tv5 = findViewById(R.id.userpositionInfo);
         Call<List<UserpositonData>> getCall = serviceApi.get_userposition();
         getCall.enqueue(new Callback<List<UserpositonData>>() {
             @Override
@@ -326,6 +330,7 @@ public class Subpage extends Activity {
                     }
                     System.out.println(userposition_info);
                     setUserPosition_info(userposition_info);
+                    tv5.setText(userposition_info);
 
                     voice.TTS(userposition_info);
                 }

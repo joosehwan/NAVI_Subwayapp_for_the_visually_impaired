@@ -1372,7 +1372,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                         result += "/" + item.getTitle();
                     }
 
-                    String str = result.substring(result.lastIndexOf("/"), result.length());
+                    String str = result.substring(result.lastIndexOf("/")+1, result.length());
                     if (str != "null") {
                         System.out.println("str : " + str);
                         System.out.println("OCR 판독 결과값 : " + result);
