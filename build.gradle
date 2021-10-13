@@ -123,7 +123,7 @@ android {
         release.setRoot('build-types/release')
     }
     defaultConfig {
-        targetSdkVersion 27
+        targetSdkVersion 30
         minSdkVersion 21
     }
     buildToolsVersion '28.0.2'

@@ -120,6 +120,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     //Setting----------------------------------------------------------------------------------------------
     private static final String YOLO_MODEL_FILE = "file:///android_asset/hanium_subway_items.pb";
+//    android_asset/hanium_subway_items.pb
     private static final int YOLO_INPUT_SIZE = 416;
     private static final String YOLO_INPUT_NAME = "input";
     private static final String YOLO_OUTPUT_NAMES = "output";
