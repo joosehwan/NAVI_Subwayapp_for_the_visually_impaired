@@ -21,7 +21,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <org.tensorflow.demo.font.OutlineTextView
+        <org.tensorflow.navi.font.OutlineTextView
 
             android:layout_width="match_parent"
             android:layout_height="54sp"
@@ -38,7 +38,7 @@
             app:textStrokeColor="@android:color/black"
             app:textStrokeWidth="5.0">
 
-        </org.tensorflow.demo.font.OutlineTextView>
+        </org.tensorflow.navi.font.OutlineTextView>
 
     </LinearLayout>
 
@@ -46,7 +46,7 @@
     <EditText
         android:id="@+id/join_id"
         android:layout_width="match_parent"
-        android:layout_height="56sp"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="40sp"
         android:layout_marginRight="40sp"
         android:layout_marginBottom="362dp"
@@ -64,8 +64,10 @@
     <Button
 
         android:id="@+id/join_button"
-        android:layout_width="160dp"
-        android:layout_height="75dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.1"
+        app:layout_constraintWidth_percent="0.37"
         android:layout_marginStart="40dp"
         android:layout_marginBottom="28dp"
         android:background="@drawable/button_style2"
@@ -74,13 +76,16 @@
         android:textColor="#000000"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/call_num" />
 
     <Button
 
         android:id="@+id/join_cancel"
-        android:layout_width="160dp"
-        android:layout_height="75dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="0.1"
+        app:layout_constraintWidth_percent="0.37"
         android:layout_marginEnd="40dp"
         android:layout_marginBottom="28dp"
         android:background="@drawable/button_style2"
@@ -88,12 +93,13 @@
         android:text="돌아가기"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/call_num" />
 
     <EditText
         android:id="@+id/join_password"
         android:layout_width="match_parent"
-        android:layout_height="56sp"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="40sp"
         android:layout_marginTop="20dp"
         android:layout_marginRight="40sp"
@@ -125,7 +131,7 @@
     <EditText
         android:id="@+id/join_pwck"
         android:layout_width="match_parent"
-        android:layout_height="56sp"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="40sp"
         android:layout_marginTop="20dp"
         android:layout_marginRight="40sp"
@@ -143,9 +149,9 @@
     <EditText
         android:id="@+id/call_num"
         android:layout_width="match_parent"
-        android:layout_height="56sp"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="40sp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="20dp"
         android:layout_marginRight="40sp"
         android:background="@drawable/edittext_style2"
         android:fontFamily="@font/gmarket"
@@ -154,11 +160,11 @@
         android:inputType="numberPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/join_password">
+        app:layout_constraintTop_toBottomOf="@+id/join_pwck">
 
     </EditText>
 
-    <org.tensorflow.demo.font.OutlineTextView
+    <org.tensorflow.navi.font.OutlineTextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

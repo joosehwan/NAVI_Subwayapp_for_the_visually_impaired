@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:background="#ffffff">
 
-    <org.tensorflow.demo.font.OutlineTextView
+    <org.tensorflow.navi.font.OutlineTextView
 
         android:id="@+id/outlineTextView"
         android:layout_width="match_parent"
@@ -30,7 +30,7 @@
         app:textStrokeColor="@android:color/black"
         app:textStrokeWidth="5.0">
 
-    </org.tensorflow.demo.font.OutlineTextView>
+    </org.tensorflow.navi.font.OutlineTextView>
 
     <Button
         android:id="@+id/login_gotoJoin"
@@ -143,7 +143,7 @@
         app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <org.tensorflow.demo.font.OutlineTextView
+    <org.tensorflow.navi.font.OutlineTextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

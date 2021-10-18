@@ -9,7 +9,7 @@ buildscript {
 
     dependencies {
 
-        classpath 'com.android.tools.build:gradle:3.3.1'
+        classpath 'com.android.tools.build:gradle:4.2.1'
         classpath 'org.apache.httpcomponents:httpclient:4.5.4'
 
 
@@ -68,9 +68,11 @@ android {
 
     if (nativeBuildSystem == 'cmake') {
         defaultConfig {
-            applicationId = 'org.tensorflow.demo'
+            applicationId = 'org.tensorflow.navi'
             minSdkVersion 21
             targetSdkVersion 30
+            versionCode 6
+            versionName "1.0.2"
             ndk {
                 abiFilters "${cpuType}"
             }
@@ -126,7 +128,7 @@ android {
         targetSdkVersion 30
         minSdkVersion 21
     }
-    buildToolsVersion '28.0.2'
+    buildToolsVersion '30.0.2'
 }
 
 task buildNativeBazel(type: Exec) {

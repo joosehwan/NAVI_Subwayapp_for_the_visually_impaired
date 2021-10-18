@@ -24,10 +24,10 @@
     android:layout_gravity="center"
     android:background="#ffffff"
 
-    tools:context="org.tensorflow.demo.CameraActivity">
+    tools:context="org.tensorflow.navi.CameraActivity">
 
 
-    <org.tensorflow.demo.font.OutlineTextView
+    <org.tensorflow.navi.font.OutlineTextView
         android:id="@+id/station_destination"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
         app:textStrokeColor="@android:color/black"
         app:textStrokeWidth="5.0" />
 
-    <org.tensorflow.demo.font.OutlineTextView
+    <org.tensorflow.navi.font.OutlineTextView
         android:id="@+id/station_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -69,11 +69,11 @@
         app:textStrokeColor="@android:color/black"
         app:textStrokeWidth="5.0" />
 
-    <org.tensorflow.demo.font.OutlineTextView
+    <org.tensorflow.navi.font.OutlineTextView
         android:id="@+id/cameraOCR"
-        android:layout_width="0sp"
-        android:layout_height="75sp"
-        android:layout_marginBottom="160dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         android:fontFamily="@font/nbgothic"
         android:gravity="center"
         android:hint="ocr텍스트 내용"
@@ -82,7 +82,7 @@
         android:shadowRadius="1.5"
         android:textColor="#FAD251"
         android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/cameraclick"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -90,8 +90,7 @@
         app:textStrokeColor="@android:color/black"
         app:textStrokeWidth="5.0" />
 
-    <org.tensorflow.demo.font.OutlineTextView
-        android:visibility="gone"
+    <org.tensorflow.navi.font.OutlineTextView
         android:id="@+id/cameracatch"
         android:layout_width="0sp"
         android:layout_height="0dp"
@@ -105,6 +104,7 @@
         android:shadowRadius="1.5"
         android:textColor="#FAD251"
         android:textSize="24sp"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/cameraclick"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -115,10 +115,11 @@
 
     <Button
         android:id="@+id/cameraclick"
-        android:layout_width="160sp"
-        android:layout_height="60sp"
-        android:layout_marginEnd="16sp"
-        android:layout_marginBottom="16sp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+
         android:background="@drawable/button_style2"
         android:fontFamily="@font/nbgothic"
         android:gravity="center"
@@ -126,7 +127,9 @@
         android:textColor="#000000"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/goto_subpage"
-        app:layout_constraintEnd_toEndOf="parent"></Button>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.1"
+        app:layout_constraintWidth_percent="0.4"></Button>
 
     <Button
         android:id="@+id/readOCR"
@@ -147,40 +150,44 @@
 
     <Button
         android:id="@+id/goto_subpage"
-        android:layout_width="160sp"
-        android:layout_height="60sp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginEnd="16sp"
-        android:layout_marginBottom="16sp"
+        android:layout_marginBottom="12dp"
         android:background="@drawable/button_style2"
         android:fontFamily="@font/nbgothic"
         android:gravity="center"
-        android:text="서브페이지"
+        android:text=" 서브페이지 "
         android:textColor="#000000"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"></Button>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.1"
+        app:layout_constraintWidth_percent="0.4"></Button>
 
     <Button
         android:id="@+id/takesubway"
-        android:layout_width="160sp"
-        android:layout_height="60sp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="16sp"
-        android:layout_marginBottom="16sp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/button_style2"
         android:fontFamily="@font/nbgothic"
         android:gravity="center"
-        android:text="열차도착 정보"
+        android:text=" 열차도착 정보 "
         android:textColor="#000000"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/input_dest"
-        app:layout_constraintStart_toStartOf="parent"></Button>
+        app:layout_constraintHeight_percent="0.1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_percent="0.4"></Button>
 
     <Button
         android:id="@+id/input_dest"
-        android:layout_width="160sp"
-        android:layout_height="60sp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="16sp"
-        android:layout_marginBottom="16sp"
+        android:layout_marginBottom="12dp"
         android:background="@drawable/button_style2"
         android:fontFamily="@font/nbgothic"
         android:gravity="center"
@@ -188,7 +195,9 @@
         android:textColor="#000000"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"></Button>
+        app:layout_constraintHeight_percent="0.1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_percent="0.4"></Button>
 
 
     <!--    <org.tensorflow.demo.font.OutlineTextView-->

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+ Copyright 2016 The TensorFlow Authors. All Rights Reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="#ffffff"
+
+    tools:context="org.tensorflow.navi.CameraActivity">
+
+
+    <org.tensorflow.navi.font.OutlineTextView
+        android:id="@+id/station_destination"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:fontFamily="@font/nbgothic"
+        android:gravity="center"
+        android:shadowDx="2.0"
+        android:shadowDy="2.0"
+        android:shadowRadius="1.5"
+        android:text="Arrival\nstation"
+        android:textColor="#FFCD4A"
+        android:textSize="28sp"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:textStroke="true"
+        app:textStrokeColor="@android:color/black"
+        app:textStrokeWidth="5.0" />
+
+    <org.tensorflow.navi.font.OutlineTextView
+        android:id="@+id/station_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/nbgothic"
+        android:gravity="center"
+        android:shadowDx="2.0"
+
+        android:shadowDy="2.0"
+        android:shadowRadius="1.5"
+        android:text="Departure\nstation"
+        android:textColor="#FFCD4A"
+        android:textSize="28sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:textStroke="true"
+        app:textStrokeColor="@android:color/black"
+        app:textStrokeWidth="5.0" />
+
+    <org.tensorflow.navi.font.OutlineTextView
+        android:id="@+id/cameraOCR"
+        android:layout_width="0sp"
+        android:layout_height="75sp"
+        android:layout_marginBottom="160dp"
+        android:fontFamily="@font/nbgothic"
+        android:gravity="center"
+        android:text="Recognized : \nTracks Jangam Seongnam"
+        android:shadowDx="2.0"
+        android:shadowDy="2.0"
+        android:shadowRadius="1.5"
+        android:textColor="#FAD251"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:textStroke="true"
+        app:textStrokeColor="@android:color/black"
+        app:textStrokeWidth="5.0" />
+
+    <org.tensorflow.navi.font.OutlineTextView
+        android:visibility="gone"
+        android:id="@+id/cameracatch"
+        android:layout_width="0sp"
+        android:layout_height="0dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="1dp"
+        android:fontFamily="@font/nbgothic"
+        android:gravity="center"
+        android:hint="전방 인식한 객체들 text로"
+        android:shadowDx="2.0"
+        android:shadowDy="2.0"
+        android:shadowRadius="1.5"
+        android:textColor="#FAD251"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@id/cameraclick"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cameraOCR"
+        app:textStroke="true"
+        app:textStrokeColor="@android:color/black"
+        app:textStrokeWidth="5.0" />
+
+    <Button
+        android:id="@+id/cameraclick"
+        android:layout_width="180dp"
+        android:layout_height="65dp"
+        android:layout_marginEnd="16sp"
+        android:layout_marginBottom="16sp"
+        android:background="@drawable/button_style2"
+        android:fontFamily="@font/nbgothic"
+        android:gravity="center"
+        android:visibility="gone"
+        android:text="Train arrival information"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/goto_subpage"
+        app:layout_constraintEnd_toEndOf="parent"></Button>
+
+    <Button
+        android:id="@+id/readOCR"
+        android:layout_width="175sp"
+        android:layout_height="60sp"
+        android:background="@drawable/button_style2"
+        android:fontFamily="@font/nbgothic"
+        android:gravity="center"
+        android:text="글자읽기"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:visibility="gone"
+
+        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"></Button>
+
+    <Button
+        android:id="@+id/goto_subpage"
+        android:visibility="gone"
+        android:layout_width="160sp"
+        android:layout_height="60sp"
+        android:layout_marginEnd="16sp"
+        android:layout_marginBottom="16sp"
+        android:background="@drawable/button_style2"
+        android:fontFamily="@font/nbgothic"
+        android:gravity="center"
+        android:text="Subpage"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"></Button>
+
+    <Button
+        android:id="@+id/takesubway"
+        android:layout_width="383dp"
+        android:layout_height="94dp"
+        android:layout_marginStart="16sp"
+        android:layout_marginBottom="44dp"
+        android:background="@drawable/button_style2"
+        android:fontFamily="@font/nbgothic"
+        android:gravity="center"
+        android:text="Front recognition
+"
+        android:textColor="#000000"
+        android:textSize="26sp"
+        app:layout_constraintBottom_toTopOf="@+id/input_dest"
+        app:layout_constraintStart_toStartOf="parent"></Button>
+
+    <Button
+        android:visibility="gone"
+        android:id="@+id/input_dest"
+        android:layout_width="189dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="16sp"
+        android:layout_marginBottom="16sp"
+        android:background="@drawable/button_style2"
+        android:fontFamily="@font/nbgothic"
+        android:gravity="center"
+        android:text="Setting the route."
+        android:textColor="#000000"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"></Button>
+
+
+    <!--    <org.tensorflow.demo.font.OutlineTextView-->
+    <!--        android:id="@+id/cameraclick"-->
+    <!--        android:layout_width="0sp"-->
+    <!--        android:layout_height="0sp"-->
+    <!--        android:fontFamily="@font/nbgothic"-->
+    <!--        android:gravity="center"-->
+    <!--        android:shadowDx="2.0"-->
+    <!--        android:shadowDy="2.0"-->
+    <!--        android:shadowRadius="1.5"-->
+    <!--        android:text="전방 인식"-->
+    <!--        android:textColor="#FAD251"-->
+    <!--        android:textSize="34sp"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/cameracatch"-->
+    <!--        app:textStroke="true"-->
+    <!--        app:textStrokeColor="@android:color/black"-->
+    <!--        app:textStrokeWidth="5.0" />-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+

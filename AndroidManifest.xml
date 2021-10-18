@@ -16,7 +16,10 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="org.tensorflow.demo">
+    package="org.tensorflow.navi"
+    android:versionCode="6"
+    android:versionName="1.0.2"
+    >
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -53,13 +56,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
-    <uses-permission android:name="android.permission.READ_CALL_LOG" />
-    <uses-permission
-        android:name="android.permission.READ_PHONE_STATE"
-        android:maxSdkVersion="30" />
     <uses-permission android:name="android.permissions.READ_PHONE_NUMBERS" />
-    <uses-permission android:name="android.permission.READ_SMS" />
+
     …
 
 
@@ -67,7 +65,7 @@
         android:allowBackup="true"
         android:appComponentFactory="whateverString"
         android:banner="@drawable/tile"
-        android:debuggable="true"
+        android:debuggable="false"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_navi"
         android:label="@string/app_name"
@@ -80,7 +78,7 @@
 
 
         <activity
-            android:name="org.tensorflow.demo.Intro_Activity"
+            android:name="org.tensorflow.navi.Intro_Activity"
             android:label="@string/activity_name_detection"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -90,12 +88,12 @@
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Subpage"></activity>
-        <activity android:name=".activity.LoginActivity"></activity>
-        <activity android:name=".activity.JoinActivity"></activity>
-        <activity android:name=".CameraActivity"></activity>
-        <activity android:name=".DetectorActivity"></activity>
-        <activity android:name=".blescan.MainActivity"></activity>
+        <activity android:name="org.tensorflow.navi.Subpage"></activity>
+        <activity android:name="org.tensorflow.navi.activity.LoginActivity"></activity>
+        <activity android:name="org.tensorflow.navi.activity.JoinActivity"></activity>
+        <activity android:name="org.tensorflow.navi.CameraActivity"></activity>
+        <activity android:name="org.tensorflow.navi.DetectorActivity"></activity>
+        <activity android:name="org.tensorflow.navi.blescan.MainActivity"></activity>
     </application>
 
 </manifest>
