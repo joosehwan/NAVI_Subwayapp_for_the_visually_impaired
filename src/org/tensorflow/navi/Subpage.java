@@ -672,6 +672,7 @@ public class Subpage extends Activity {
 
             @Override
             public void callbackBundle(Bundle results) {
+
                 String key = "";
                 key = SpeechRecognizer.RESULTS_RECOGNITION;
                 ArrayList<String> mResult = results.getStringArrayList(key);
@@ -681,37 +682,37 @@ public class Subpage extends Activity {
 
                 try {
                     Thread.sleep(2000);
+////
 //
-
-                    if (answer.charAt(0) == '아' && answer.charAt(1) == '니') {    // 아니오 라고 말했을때
-                        Subpage.this.initCompletedStatus = 0;
-                        is_station_perfect = false;
-                    } else if (answer.charAt(0) != '네' && answer.charAt(0) != '내' && answer.charAt(0) != '예') { //대답이 애매하거나 다른대답일때
-                        // 출발지, 도착지가 제대로 체크되지 않았다면, 함수 다시 시작!
-                        voice.TTS("다시 버튼을 눌러주세요.");
-                    } else {
-                        //제대로 체크됬다면 확정짓고 출발역의 맵데이터를 가져온다.
-                        Log.e("v", "Result src & dst: " + service.getSource_Station());
-                        Toast.makeText(Subpage.this, "연결할 역센터 = " + service.getSource_Station(), Toast.LENGTH_SHORT).show();
-
-//                      서버 통신을 시작한다. 현재시간과 출발역 도착역 데이터를 서버에 전송한다.
-                        is_station_perfect = true;
-                        System.out.println("is station perfect =" + is_station_perfect);
-                        if (is_station_perfect == true) {
+//                    if (answer.charAt(0) == '아' && answer.charAt(1) == '니') {    // 아니오 라고 말했을때
+//                        Subpage.this.initCompletedStatus = 0;
+//                        is_station_perfect = false;
+//                    } else if (answer.charAt(0) != '네' && answer.charAt(0) != '내' && answer.charAt(0) != '예') { //대답이 애매하거나 다른대답일때
+//                        // 출발지, 도착지가 제대로 체크되지 않았다면, 함수 다시 시작!
+//                        voice.TTS("다시 버튼을 눌러주세요.");
+//                    } else {
+//                        //제대로 체크됬다면 확정짓고 출발역의 맵데이터를 가져온다.
+//                        Log.e("v", "Result src & dst: " + service.getSource_Station());
+//                        Toast.makeText(Subpage.this, "연결할 역센터 = " + service.getSource_Station(), Toast.LENGTH_SHORT).show();
 //
+////                      서버 통신을 시작한다. 현재시간과 출발역 도착역 데이터를 서버에 전송한다.
+//                        is_station_perfect = true;
+//                        System.out.println("is station perfect =" + is_station_perfect);
+//                        if (is_station_perfect == true) {
+////
+////
+////          1.출발지와 목적지가 정확하다면 현재시각과 출발역을 서버로 post통신한다
+//                            new Thread(new Runnable() {
 //
-//          1.출발지와 목적지가 정확하다면 현재시각과 출발역을 서버로 post통신한다
-                            new Thread(new Runnable() {
-
-                                @Override
-                                public void run() {
-
-                                }
-                            }).start();
+//                                @Override
+//                                public void run() {
 //
-                        }
-
-                    }
+//                                }
+//                            }).start();
+////
+//                        }
+//
+//                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -732,36 +733,55 @@ public class Subpage extends Activity {
                 stt_srcStation = mResult.get(0);
                 stt_srcStation = recognizeStation(stt_srcStation);//입력받은 단어 파싱
                 System.out.println("get : " + stt_srcStation);
-                service.setSource_Station(stt_srcStation);
-                Log.e("v", "Start Station onResults: " + service.getSource_Station()); //입력값 파싱 후 역 이름 로그 찍어보기
-//                System.out.println("service.getSource_Station() : " + service.getSource_Station());
-                voice.TTS(service.getSource_Station() + "역 센터번호로 전화를 겁니다");
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        int i = Arrays.asList(subway_Station_name).indexOf(service.getSource_Station());
-                        String num = "02-" + Emg_num[i];
-                        System.out.println("전번" + num);
+//
+                String st = stt_srcStation;
+                String st2 = st.substring(st.length() - 1, st.length() - 0);
+                System.out.println("st : " + st);
+                System.out.println(("st2 :" + st2));
+                if (st2.equals("역")) {
+                    System.out.println("역자른거 :" + st.substring(0, st.length() - 1));
+                    service.setSource_Station(st.substring(0, st.length() - 1));
 
-                        Intent intent_call = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + num));
-                        startActivity(intent_call);
+                } else {
+                    service.setSource_Station(stt_srcStation);
 
-                    }
-                }, 3000);
+                }
 
-                Subpage.this.initCompletedStatus = 1;
+                try {
+                    Log.e("v", "Start Station onResults: " + service.getSource_Station()); //입력값 파싱 후 역 이름 로그 찍어보기
+
+                    voice.TTS(service.getSource_Station() + "역 센터번호로 전화를 겁니다");
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                int i = Arrays.asList(subway_Station_name).indexOf(service.getSource_Station());
+                                String num = "02-" + Emg_num[i];
+                                System.out.println("전번" + num);
+                                Subpage.this.initCompletedStatus = 1;
+                                Intent intent_call = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + num));
+                                startActivity(intent_call);
+
+                            } catch (Exception e) {
+                                voice.TTS("입력에러.현재역을 다시 말해주세요.");
+                                Subpage.this.initCompletedStatus = 0;
+                            }
+
+                        }
+                    }, 3000);
+
+                } catch (NullPointerException e) {
+                    voice.TTS("입력에러.현재역을 다시 말해주세요.");
+                }
 
                 try {
                     Thread.sleep(4000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
-//
             }
         });
-        ArrayList<RecognitionListener> ListenerArray = new ArrayList<RecognitionListener>(Arrays.asList(sourceStationVoiceListener,
-                confirmVoiceListener));
+        ArrayList<RecognitionListener> ListenerArray = new ArrayList<RecognitionListener>(Arrays.asList(sourceStationVoiceListener));
 
         // init 시작
         try {
