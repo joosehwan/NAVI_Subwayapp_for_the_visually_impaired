@@ -255,26 +255,19 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         checkBluetooth();
 
 
-        readocr.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        readocr.setOnClickListener(v -> {
 
 
-            }
         });
 //       열차도착예정버튼()
-        takesubway.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        takesubway.setOnClickListener(v -> {
 
-                try {
-                    request_Getsubwaynum();
+            try {
+                request_Getsubwaynum();
 
-                } catch (Exception e) {
+            } catch (Exception e) {
 
-                }
             }
-
         });
 
         goSub.setOnClickListener(new View.OnClickListener() {
@@ -379,28 +372,28 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
                         switch (Deduplicated_labellist.get(i)) {
                             case "elevator":
-                                changeResult = "엘레베이터";
+                                changeResult = "엘레베이터가";
                                 break;
                             case "turnstile":
-                                changeResult = "개찰구";
+                                changeResult = "개찰구가";
                                 break;
                             case "chair":
-                                changeResult = "의자";
+                                changeResult = "의자가";
                                 break;
                             case "stairs":
-                                changeResult = "계단";
+                                changeResult = "계단이";
                                 break;
                             case "escalator":
-                                changeResult = "에스컬레이터";
+                                changeResult = "에스컬레이터가";
                                 break;
                             case "toilet":
-                                changeResult = "화장실";
+                                changeResult = "화장실이";
                                 break;
                             case "sign":
-                                changeResult = "이정표";
+                                changeResult = "이정표가";
                                 break;
                             case "number":
-                                changeResult = "번호칸";
+                                changeResult = "번호칸이";
                                 break;
                             default:
                                 break;
@@ -417,7 +410,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                     voice.TTS("전방에 장애물이 없습니다");
                     ocrtext.setText("전방에 장애물이 없습니다");
                 } else {
-                    voice.TTS("  전방에" + front + "들이 있습니다.");
+                    voice.TTS("  전방에" + front + " 있습니다.");
                 }
 
 
@@ -1101,6 +1094,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                     String result_body = new Gson().toJson(response.body());
                     System.out.println(result_body + " = result-body ");
                     System.out.println(result.toString() + " = result-body ");
+                    System.out.println("포스트 성공");
+
 
                 }
             }

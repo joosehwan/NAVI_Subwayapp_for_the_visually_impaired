@@ -25,24 +25,14 @@ public class Intro_Activity extends Activity {
             @Override
             public void run() {
 
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                voice.TTS("시각장애인을 위한 지하철어플. 나비에 오신것을 환영합니다. 로그인을 진행해주세요");
-
-                try{
-                    PackageInfo pi = getPackageManager().getPackageInfo(getPackageName(),0);
-                    String vn= pi.versionName;
-                    int vc= pi.versionCode;
-                    System.out.println("코드"+vn+"\n"+vc);
-
-                }catch (PackageManager.NameNotFoundException e){
-                    e.printStackTrace();
-                }
+                Intent intent = new Intent(getApplicationContext(), DetectorActivity.class);
+                voice.TTS("시각장애인을 위한 지하철어플. 나비에 오신것을 환영합니다");
 
                 startActivity(intent);
                 finish();
             }
 
-        },3000);
+        },3500);
     }
 
     @Override
