@@ -132,6 +132,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         YOLO
     }
 
+    
     private static final DetectorMode MODE = DetectorMode.YOLO;
     // Minimum detection confidence to track a detection.
     public static final float MINIMUM_CONFIDENCE_YOLO = 0.5f;
